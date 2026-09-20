@@ -1895,7 +1895,7 @@ body.mode-tetris {
       const chosenCells = candidate.cells;
       const duration = skipAnim.checked ? 0 : 550;
 
-      await animateMove(type, chosenCells, spawnX, candidate.x, (candidate.landY) * CELL, duration);
+      await animateMove(type, chosenCells, spawnX, candidate.x, candidate.landY, duration);
 
       placeCells(board, chosenCells, candidate.x, candidate.landY, type);
       const { board: clearedBoard, cleared } = clearLines(board);
