@@ -1715,10 +1715,45 @@ body.mode-tetris {
         placeCells(test, cells, x, landY, type);
         const { board: cleared, cleared: linesCleared } = clearLines(test);
         const metrics = computeMetrics(cleared);
-        candidates.push({ rotIndex, x, landY, cells, linesCleared, ...metrics });
+        const heuristicScore = scoreMetrics(metrics, linesCleared);
+        candidates.push({ rotIndex, x, landY, cells, linesCleared, ...metrics, heuristicScore, resultBoard: cleared });
       }
     });
     return candidates;
+  }
+
+  // 標準的な重み付け(Dellacherie/El-Tetris系)。高いほど良い盤面。
+  function scoreMetrics(metrics, linesCleared) {
+    return (
+      -0.510066 * metrics.aggregateHeight +
+      0.760666 * linesCleared +
+      -0.35663 * metrics.holes +
+      -0.184483 * metrics.bumpiness
+    );
+  }
+
+  // 次のピースを最適に置いた場合に見込める最良スコア(1手先読み)
+  function bestNextScore(board, nextPieceType) {
+    if (!nextPieceType) return 0;
+    const candidates = generateCandidates(board, nextPieceType);
+    let best = -Infinity;
+    for (const c of candidates) if (c.heuristicScore > best) best = c.heuristicScore;
+    return best === -Infinity ? 0 : best;
+  }
+
+  const LOOKAHEAD_WEIGHT = 0.7;
+  const MAX_CANDIDATES_SHOWN = 8;
+
+  // 現在ピースの候補に、次のピースを踏まえた総合スコアを付けて上位だけに絞る
+  function rankCandidates(board, type, peekedNext) {
+    const candidates = generateCandidates(board, type);
+    for (const c of candidates) {
+      const next = bestNextScore(c.resultBoard, peekedNext);
+      c.nextBestScore = next;
+      c.totalScore = c.heuristicScore + LOOKAHEAD_WEIGHT * next;
+    }
+    candidates.sort((a, b) => b.totalScore - a.totalScore);
+    return candidates.slice(0, MAX_CANDIDATES_SHOWN);
   }
 
   // ---------- 7-bag randomizer ----------
@@ -1734,6 +1769,10 @@ body.mode-tetris {
   function nextType() {
     if (bag.length === 0) bag = shuffle(['I','O','T','S','Z','J','L']);
     return bag.pop();
+  }
+  function peekNextType() {
+    if (bag.length === 0) bag = shuffle(['I','O','T','S','Z','J','L']);
+    return bag[bag.length - 1];
   }
 
   // ---------- game state ----------
@@ -1823,14 +1862,17 @@ body.mode-tetris {
   function buildJevRequest(type, candidates) {
     const criteria = {};
     candidates.forEach((c, i) => {
-      criteria["c" + i] = `高さ合計=${c.aggregateHeight}, 穴の数=${c.holes}, 凹凸=${c.bumpiness}, 消去ライン=${c.linesCleared}`;
+      criteria["c" + i] =
+        `順位${i + 1}(スコア${c.totalScore.toFixed(2)}): ` +
+        `高さ合計=${c.aggregateHeight}, 穴の数=${c.holes}, 凹凸=${c.bumpiness}, 消去ライン=${c.linesCleared}, ` +
+        `次のピースを最適配置した場合の見込みスコア=${c.nextBestScore.toFixed(2)}`;
     });
     return {
-      state: `テトリスの盤面。落ちてくるピースは${type}。各候補は配置後の盤面指標を表す(高さ合計・穴の数・凹凸は小さいほど良く、消去ラインは大きいほど良い)。`,
+      state: `テトリスの盤面。落ちてくるピースは${type}。候補はスコアの高い順(順位1位が最良)に並んでおり、次のピースまで考慮した見込みスコアも含む。`,
       questions: {
         move: {
           type: "choice",
-          instructions: "最も盤面を良い状態に保てる配置を1つ選んでください。穴を作らず、高さを低く、凹凸を減らし、可能ならラインを消せる配置を優先してください。",
+          instructions: "この中から最も盤面を良い状態に保てる配置を1つ選んでください。基本的にはスコアが最も高い(順位1位の)候補を選ぶべきですが、次のピースの見込みスコアも著しく良い場合はそちらを優先しても構いません。",
           criteria
         }
       }
@@ -1890,16 +1932,16 @@ body.mode-tetris {
     setThinking(true, "Jevが" + type + "ピースを審議中...");
 
     try {
-      const candidates = generateCandidates(board, type);
+      const peeked = peekNextType();
+      const candidates = rankCandidates(board, type, peeked);
       const { candidate, confidence } = await askJev(type, candidates);
       const chosenCells = candidate.cells;
       const duration = skipAnim.checked ? 0 : 550;
 
       await animateMove(type, chosenCells, spawnX, candidate.x, candidate.landY, duration);
 
-      placeCells(board, chosenCells, candidate.x, candidate.landY, type);
-      const { board: clearedBoard, cleared } = clearLines(board);
-      board = clearedBoard;
+      board = candidate.resultBoard;
+      const cleared = candidate.linesCleared;
 
       piecesTotal++;
       linesTotal += cleared;
@@ -1908,7 +1950,8 @@ body.mode-tetris {
       statLines.textContent = linesTotal;
       statPieces.textContent = piecesTotal;
 
-      lastMove.innerHTML = `<b>${type}</b> → 回転${candidate.rotIndex} / x=${candidate.x}` +
+      const rank = candidates.indexOf(candidate) + 1;
+      lastMove.innerHTML = `<b>${type}</b> → 順位${rank > 0 ? rank : "?"}位の候補 (回転${candidate.rotIndex} / x=${candidate.x})` +
         (cleared ? ` / <b>${cleared}ライン消去!</b>` : "") +
         (typeof confidence === "number" ? ` / confidence ${Math.round(confidence*100)}%` : "");
 
