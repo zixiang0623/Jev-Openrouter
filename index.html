@@ -299,6 +299,37 @@ body.mode-console {
     white-space: pre;
     color: var(--text);
   }
+#view-console textarea.raw-editor {
+    display: block;
+    width: 100%;
+    margin: 8px 0 0;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font: 12px/1.55 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--text);
+    resize: vertical;
+    min-height: 160px;
+    white-space: pre;
+    tab-size: 2;
+  }
+#view-console textarea.raw-editor:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    outline: none;
+  }
+#view-console .dirty-badge {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--score) 22%, transparent);
+    color: var(--score);
+    vertical-align: middle;
+  }
 #view-console .resp-empty {
     display: flex;
     flex-direction: column;
@@ -635,9 +666,13 @@ body.mode-magi {
           <button class="primary" id="runBtn">実行</button>
         </div>
 
-        <details class="raw">
-          <summary>送信するリクエストを見る</summary>
-          <pre class="code" id="reqPreview">{}</pre>
+        <details class="raw" open>
+          <summary>
+            送信するリクエスト(直接編集できます)
+            <span id="reqDirtyBadge" class="dirty-badge" hidden>手動編集中</span>
+          </summary>
+          <textarea class="code raw-editor" id="reqPreview" spellcheck="false" autocomplete="off"></textarea>
+          <button type="button" class="ghost sm" id="regenReqBtn" style="margin-top:6px;">フォームから再生成</button>
         </details>
       </div>
     </div>
@@ -954,12 +989,17 @@ body.mode-magi {
       if (!p) return;
       stateInput.value = p.state;
       questions = p.questions.map(q => blankQuestion(q));
+      requestDirty = false;
+      reqDirtyBadge.hidden = true;
       renderQuestions();
     });
   });
 
   // ---------- request building ----------
   const reqPreview = $("#reqPreview");
+  const reqDirtyBadge = $("#reqDirtyBadge");
+  const regenReqBtn = $("#regenReqBtn");
+  let requestDirty = false;
 
   function parseState(raw) {
     const trimmed = raw.trim();
@@ -1005,8 +1045,20 @@ body.mode-magi {
   }
 
   function updateRequestPreview() {
-    reqPreview.textContent = JSON.stringify(buildRequestBody(), null, 2);
+    if (requestDirty) return; // 手動編集中はフォームからの自動上書きを止める
+    reqPreview.value = JSON.stringify(buildRequestBody(), null, 2);
   }
+
+  reqPreview.addEventListener("input", () => {
+    requestDirty = true;
+    reqDirtyBadge.hidden = false;
+  });
+
+  regenReqBtn.addEventListener("click", () => {
+    requestDirty = false;
+    reqDirtyBadge.hidden = true;
+    reqPreview.value = JSON.stringify(buildRequestBody(), null, 2);
+  });
 
   // ---------- run ----------
   const runBtn = $("#runBtn");
@@ -1133,9 +1185,15 @@ body.mode-magi {
   }
 
   async function run() {
-    const body = buildRequestBody();
-    if (Object.keys(body.questions).length === 0) {
-      setErrorState("質問を1つ以上追加し、質問名を入力してください。");
+    let body;
+    try {
+      body = JSON.parse(reqPreview.value);
+    } catch (err) {
+      setErrorState("リクエストのJSONが不正です。構文を確認してください。", String(err));
+      return;
+    }
+    if (!body.questions || Object.keys(body.questions).length === 0) {
+      setErrorState("questions が空です。質問を1つ以上追加するか、リクエストを直接編集してください。");
       return;
     }
 
