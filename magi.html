@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MAGI SYSTEM</title>
+<style>
+  :root {
+    --bg: oklch(12% 0.01 80);
+    --bg-2: oklch(16% 0.015 80);
+    --panel: oklch(18% 0.02 80);
+    --panel-line: oklch(30% 0.03 80);
+    --amber: oklch(78% 0.16 80);
+    --amber-dim: oklch(55% 0.12 80);
+    --amber-glow: oklch(78% 0.16 80 / 0.35);
+    --green: oklch(72% 0.17 150);
+    --green-glow: oklch(72% 0.17 150 / 0.35);
+    --red: oklch(62% 0.20 25);
+    --red-glow: oklch(62% 0.20 25 / 0.35);
+    --text: oklch(88% 0.02 80);
+    --text-dim: oklch(60% 0.02 80);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background:
+      repeating-linear-gradient(0deg, oklch(0% 0 0 / 0.12) 0px, oklch(0% 0 0 / 0.12) 1px, transparent 1px, transparent 3px),
+      radial-gradient(1000px 500px at 50% -10%, var(--bg-2), var(--bg));
+    color: var(--text);
+    font: 400 15px/1.6 ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 40px) clamp(14px, 4vw, 28px) 64px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body { animation: flicker 6s infinite; }
+  }
+  @keyframes flicker {
+    0%, 96%, 100% { opacity: 1; }
+    97% { opacity: 0.985; }
+    98% { opacity: 1; }
+    99% { opacity: 0.99; }
+  }
+
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 26px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-shadow: 0 0 14px var(--amber-glow);
+    font-weight: 700;
+  }
+  header p {
+    margin: 8px 0 0;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+  header .status-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.72rem;
+    color: var(--amber-dim);
+    letter-spacing: 0.06em;
+  }
+  header .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber-glow);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    header .status-dot { animation: pulse 1.8s ease-in-out infinite; }
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 4px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--amber-dim);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+  }
+  textarea {
+    width: 100%;
+    background: oklch(9% 0.01 80);
+    border: 1px solid var(--panel-line);
+    color: var(--text);
+    font: inherit;
+    padding: 10px 12px;
+    border-radius: 3px;
+    resize: vertical;
+    min-height: 72px;
+    outline: none;
+  }
+  textarea:focus-visible {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 2px var(--amber-glow);
+  }
+  textarea::placeholder { color: var(--text-dim); }
+
+  button {
+    font: inherit;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    padding: 10px 20px;
+    border-radius: 3px;
+    transition: transform 90ms ease-out, background 150ms ease, box-shadow 150ms ease;
+    margin-top: 12px;
+  }
+  button:hover { background: oklch(78% 0.16 80 / 0.08); box-shadow: 0 0 12px var(--amber-glow); }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .nodes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 640px) {
+    .nodes { grid-template-columns: 1fr; }
+  }
+
+  .node {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+    padding: 20px 16px 18px;
+    text-align: center;
+    transition: border-color 300ms ease, box-shadow 300ms ease;
+    opacity: 0.35;
+  }
+  .node.active { opacity: 1; }
+  .node.pending .node-status { color: var(--text-dim); }
+  .node.thinking { border-color: var(--amber-dim); box-shadow: 0 0 16px var(--amber-glow) inset; }
+  .node.thinking .node-status { color: var(--amber); }
+  .node.agree { border-color: var(--green); box-shadow: 0 0 20px var(--green-glow) inset; }
+  .node.agree .node-status { color: var(--green); }
+  .node.disagree { border-color: var(--red); box-shadow: 0 0 20px var(--red-glow) inset; }
+  .node.disagree .node-status { color: var(--red); }
+
+  .node-id { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 4px; }
+  .node-name { font-size: 1rem; letter-spacing: 0.1em; color: var(--amber); font-weight: 700; margin-bottom: 10px; }
+  .node-role { font-size: 0.68rem; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5; }
+  .node-status { font-size: 0.85rem; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; min-height: 1.2em; }
+  .node-bar-track { height: 5px; background: oklch(9% 0.01 80); border-radius: 3px; overflow: hidden; }
+  .node-bar-fill { height: 100%; width: 0%; background: var(--amber-dim); transition: width 500ms cubic-bezier(0.16,1,0.3,1), background 300ms ease; }
+  .node.agree .node-bar-fill { background: var(--green); }
+  .node.disagree .node-bar-fill { background: var(--red); }
+  .node-pct { font-size: 0.68rem; color: var(--text-dim); margin-top: 4px; }
+
+  .verdict {
+    text-align: center;
+    padding: 26px 16px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 400ms ease, transform 400ms ease;
+  }
+  .verdict.show { opacity: 1; transform: translateY(0); }
+  .verdict-tally { font-size: 0.75rem; letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 8px; }
+  .verdict-word {
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    letter-spacing: 0.2em;
+    font-weight: 700;
+  }
+  .verdict.pass .verdict-word { color: var(--green); text-shadow: 0 0 20px var(--green-glow); }
+  .verdict.fail .verdict-word { color: var(--red); text-shadow: 0 0 20px var(--red-glow); }
+
+  .error-box {
+    border: 1px solid var(--red);
+    color: var(--red);
+    background: oklch(20% 0.03 25);
+    padding: 12px 14px;
+    border-radius: 3px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  details.raw { margin-top: 6px; }
+  details.raw summary {
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  pre.code {
+    margin: 8px 0 0;
+    background: oklch(9% 0.01 80);
+    border: 1px solid var(--panel-line);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-x: auto;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>M A G I &nbsp;S Y S T E M</h1>
+    <p>三賢者合議制 意思決定コンソール — MELCHIOR / BALTHASAR / CASPER</p>
+    <div class="status-line"><span class="status-dot"></span>STANDBY</div>
+  </header>
+
+  <div class="panel">
+    <p class="panel-title">議題</p>
+    <textarea id="topic" placeholder="例: 新しい機能を今週リリースすべきか？"></textarea>
+    <div>
+      <button id="runBtn">審議開始</button>
+    </div>
+  </div>
+
+  <div id="errorBox"></div>
+
+  <div class="nodes">
+    <div class="node pending" id="node-melchior">
+      <div class="node-id">MELCHIOR-1</div>
+      <div class="node-name">科学者</div>
+      <div class="node-role">実務的・技術的な妥当性を審議</div>
+      <div class="node-status">待機中</div>
+      <div class="node-bar-track"><div class="node-bar-fill"></div></div>
+      <div class="node-pct">&nbsp;</div>
+    </div>
+    <div class="node pending" id="node-balthasar">
+      <div class="node-id">BALTHASAR-2</div>
+      <div class="node-name">母</div>
+      <div class="node-role">リスク・安全性の観点を審議</div>
+      <div class="node-status">待機中</div>
+      <div class="node-bar-track"><div class="node-bar-fill"></div></div>
+      <div class="node-pct">&nbsp;</div>
+    </div>
+    <div class="node pending" id="node-casper">
+      <div class="node-id">CASPER-3</div>
+      <div class="node-name">女</div>
+      <div class="node-role">直感・心情的な納得感を審議</div>
+      <div class="node-status">待機中</div>
+      <div class="node-bar-track"><div class="node-bar-fill"></div></div>
+      <div class="node-pct">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="panel verdict" id="verdict">
+    <div class="verdict-tally" id="verdictTally">&nbsp;</div>
+    <div class="verdict-word" id="verdictWord">&nbsp;</div>
+    <details class="raw">
+      <summary>Raw JSON</summary>
+      <pre class="code" id="rawJson">{}</pre>
+    </details>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+
+  const NODES = [
+    {
+      key: "melchior",
+      el: $("node-melchior"),
+      instructions: "MELCHIOR-1（科学者としての視点）として、次の議題を実務的・技術的な妥当性の観点から審議せよ。根拠や実現可能性が十分にあるかを重視する。",
+      trueDesc: "技術的・実務的に妥当であり、進めるべきと判断する",
+      falseDesc: "技術的・実務的な根拠が不十分で、進めるべきではないと判断する"
+    },
+    {
+      key: "balthasar",
+      el: $("node-balthasar"),
+      instructions: "BALTHASAR-2（母としての視点）として、次の議題をリスクや安全性、守るべきものの観点から審議せよ。誰かを危険や不利益にさらさないかを重視する。",
+      trueDesc: "リスクは許容範囲であり、進めるべきと判断する",
+      falseDesc: "リスクや懸念が大きく、進めるべきではないと判断する"
+    },
+    {
+      key: "casper",
+      el: $("node-casper"),
+      instructions: "CASPER-3（女としての視点）として、次の議題を直感・心情的な納得感の観点から審議せよ。素直に良いと感じられるかを重視する。",
+      trueDesc: "直感的・心情的に納得でき、進めるべきと判断する",
+      falseDesc: "直感的・心情的に納得できず、進めるべきではないと判断する"
+    }
+  ];
+
+  const topicInput = $("topic");
+  const runBtn = $("runBtn");
+  const errorBox = $("errorBox");
+  const verdictEl = $("verdict");
+  const verdictTally = $("verdictTally");
+  const verdictWord = $("verdictWord");
+  const rawJson = $("rawJson");
+
+  function setNodeState(node, state) {
+    node.el.classList.remove("pending", "thinking", "agree", "disagree");
+    node.el.classList.add(state, "active");
+  }
+
+  function resetUI() {
+    errorBox.innerHTML = "";
+    verdictEl.classList.remove("show", "pass", "fail");
+    verdictTally.textContent = "\u00a0";
+    verdictWord.textContent = "\u00a0";
+    rawJson.textContent = "{}";
+    for (const n of NODES) {
+      n.el.classList.remove("agree", "disagree", "thinking");
+      n.el.classList.add("pending");
+      n.el.querySelector(".node-status").textContent = "審議中...";
+      n.el.querySelector(".node-bar-fill").style.width = "0%";
+      n.el.querySelector(".node-pct").innerHTML = "&nbsp;";
+    }
+  }
+
+  function buildBody(topic) {
+    const questions = {};
+    for (const n of NODES) {
+      questions[n.key] = {
+        type: "noul",
+        instructions: n.instructions,
+        criteria: { true: n.trueDesc, false: n.falseDesc }
+      };
+    }
+    return { state: topic, questions };
+  }
+
+  function revealNode(node, prob, delay) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const pct = Math.round(Math.max(0, Math.min(1, prob)) * 100);
+        const agree = prob >= 0.5;
+        setNodeState(node, agree ? "agree" : "disagree");
+        node.el.querySelector(".node-status").textContent = agree ? "可決" : "否決";
+        node.el.querySelector(".node-bar-fill").style.width = pct + "%";
+        node.el.querySelector(".node-pct").textContent = "confidence " + pct + "%";
+        resolve(agree);
+      }, delay);
+    });
+  }
+
+  async function run() {
+    const topic = topicInput.value.trim();
+    if (!topic) {
+      topicInput.focus();
+      return;
+    }
+
+    runBtn.disabled = true;
+    resetUI();
+    for (const n of NODES) setNodeState(n, "thinking");
+
+    try {
+      const res = await fetch("/api/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildBody(topic))
+      });
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch (e) { json = null; }
+
+      if (!res.ok || json === null) {
+        throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
+      }
+
+      rawJson.textContent = JSON.stringify(json, null, 2);
+      const answers = json.answers || {};
+
+      const votes = [];
+      let delay = 300;
+      for (const n of NODES) {
+        const ans = answers[n.key];
+        const prob = ans && typeof ans.noul === "number" ? ans.noul : 0;
+        votes.push(revealNode(n, prob, delay));
+        delay += 550;
+      }
+      const results = await Promise.all(votes);
+      const agreeCount = results.filter(Boolean).length;
+
+      await new Promise((r) => setTimeout(r, 500));
+      const pass = agreeCount >= 2;
+      verdictTally.textContent = "議決: " + agreeCount + " : " + (3 - agreeCount);
+      verdictWord.textContent = pass ? "可決" : "否決";
+      verdictEl.classList.add("show", pass ? "pass" : "fail");
+    } catch (err) {
+      for (const n of NODES) setNodeState(n, "pending");
+      errorBox.innerHTML = '<div class="error-box"><strong>審議を継続できません</strong><br>' +
+        String(err && err.message ? err.message : err).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])) +
+        "</div>";
+    } finally {
+      runBtn.disabled = false;
+    }
+  }
+
+  runBtn.addEventListener("click", run);
+})();
+</script>
+</body>
+</html>
