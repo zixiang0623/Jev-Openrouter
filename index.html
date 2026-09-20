@@ -17,6 +17,7 @@
     top: 0;
     z-index: 100;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
     padding: calc(10px + env(safe-area-inset-top, 0px)) 10px 10px;
@@ -619,6 +620,135 @@ body.mode-magi {
     color: var(--text-dim);
   }
 
+#view-tetris {
+    --bg: oklch(14% 0.03 285);
+    --bg-2: oklch(19% 0.04 285);
+    --panel: oklch(20% 0.03 285 / 0.85);
+    --panel-line: oklch(38% 0.06 285);
+    --text: oklch(92% 0.02 285);
+    --text-dim: oklch(65% 0.03 285);
+    --accent: oklch(78% 0.19 320);
+    --accent-glow: oklch(78% 0.19 320 / 0.4);
+    --cyan: oklch(80% 0.15 200);
+    --green: oklch(75% 0.17 150);
+    --red: oklch(65% 0.20 25);
+    --yellow: oklch(85% 0.16 95);
+  }
+#view-tetris * { box-sizing: border-box; }
+body.mode-tetris { margin: 0; padding: 0; }
+body.mode-tetris {
+    min-height: 100vh;
+    background: radial-gradient(900px 500px at 50% -10%, var(--bg-2), var(--bg));
+    color: var(--text);
+    font: 400 15px/1.5 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 32px) clamp(14px, 4vw, 24px) 64px;
+  }
+#view-tetris .wrap { max-width: 780px; margin: 0 auto; }
+#view-tetris header { text-align: center; margin-bottom: 20px; }
+#view-tetris header h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    letter-spacing: 0.14em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+#view-tetris header p { margin: 6px 0 0; font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.02em; }
+#view-tetris .layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+    justify-content: center;
+  }
+@media (max-width: 620px) {#view-tetris .layout { grid-template-columns: 1fr; justify-items: center; }}
+#view-tetris .board-frame {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 0 30px oklch(0% 0 0 / 0.4);
+  }
+#view-tetris canvas#board {
+    display: block;
+    border-radius: 6px;
+    background: oklch(10% 0.02 285);
+  }
+#view-tetris .side { display: flex; flex-direction: column; gap: 14px; min-width: 220px; width: 100%; max-width: 320px; }
+#view-tetris .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+#view-tetris .panel h2 {
+    margin: 0 0 10px;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+#view-tetris .stat-row { display: flex; justify-content: space-between; font-size: 0.86rem; padding: 3px 0; }
+#view-tetris .stat-row span:last-child { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+#view-tetris .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+#view-tetris button {
+    font: 700 0.82rem/1.4 inherit;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    border: 1px solid var(--panel-line);
+    background: oklch(100% 0 0 / 0.04);
+    color: var(--text);
+    padding: 9px 16px;
+    border-radius: 8px;
+    transition: transform 90ms ease-out, background 150ms ease, box-shadow 150ms ease;
+  }
+#view-tetris button:hover { background: oklch(100% 0 0 / 0.09); }
+#view-tetris button:active { transform: scale(0.96); }
+#view-tetris button:disabled { opacity: 0.4; cursor: not-allowed; }
+#view-tetris button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#view-tetris button.primary { background: var(--accent); color: oklch(15% 0.02 285); border-color: transparent; box-shadow: 0 0 16px var(--accent-glow); }
+#view-tetris button.primary:hover { filter: brightness(1.08); }
+#view-tetris label.check {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.8rem; color: var(--text-dim); cursor: pointer;
+  }
+#view-tetris .thinking-line {
+    font-size: 0.78rem;
+    color: var(--cyan);
+    min-height: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+#view-tetris .thinking-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan);
+  }
+@media (prefers-reduced-motion: no-preference) {#view-tetris .thinking-dot.active { animation: blink 1s ease-in-out infinite; }}
+@keyframes blink {0%,100% { opacity: 1; } 50% { opacity: 0.25; }}
+#view-tetris .last-move { font-size: 0.76rem; color: var(--text-dim); line-height: 1.6; }
+#view-tetris .last-move b { color: var(--text); }
+#view-tetris .error-box {
+    border: 1px solid var(--red);
+    color: var(--red);
+    background: oklch(22% 0.05 25);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+#view-tetris .gameover-banner {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--red);
+    padding: 8px 0 2px;
+  }
+
 </style>
 </head>
 <body class="mode-console">
@@ -626,6 +756,7 @@ body.mode-magi {
 <div class="mode-switch">
   <button id="tab-console" type="button" aria-pressed="true">Jev Console</button>
   <button id="tab-magi" type="button" aria-pressed="false">MAGI SYSTEM</button>
+  <button id="tab-tetris" type="button" aria-pressed="false">JEV TETRIS</button>
 </div>
 
 <div class="view" id="view-console">
@@ -756,6 +887,52 @@ body.mode-magi {
       <summary>Raw JSON</summary>
       <pre class="code" id="rawJson">{}</pre>
     </details>
+  </div>
+
+</div>
+</div>
+
+<div class="view" id="view-tetris" hidden>
+<div class="wrap">
+
+  <header>
+    <h1>JEV TETRIS</h1>
+    <p>盤面の候補手をJevに評価させて、1手ずつ自動でプレイするデモ</p>
+  </header>
+
+  <div class="layout">
+    <div class="board-frame">
+      <canvas id="board" width="240" height="480"></canvas>
+    </div>
+
+    <div class="side">
+      <div class="panel">
+        <h2>Status</h2>
+        <div class="stat-row"><span>スコア</span><span id="statScore">0</span></div>
+        <div class="stat-row"><span>ライン</span><span id="statLines">0</span></div>
+        <div class="stat-row"><span>ピース数</span><span id="statPieces">0</span></div>
+        <div class="thinking-line"><span class="thinking-dot" id="thinkingDot"></span><span id="thinkingText">待機中</span></div>
+      </div>
+
+      <div class="panel">
+        <h2>Controls</h2>
+        <div class="controls">
+          <button class="primary" id="startBtn">開始</button>
+          <button id="resetBtn">リセット</button>
+        </div>
+        <label class="check" style="margin-top:10px;">
+          <input type="checkbox" id="skipAnim"> アニメーションを省略(高速再生)
+        </label>
+      </div>
+
+      <div class="panel">
+        <h2>Jevの直前の判断</h2>
+        <div class="last-move" id="lastMove">まだありません</div>
+      </div>
+
+      <div id="tetrisErrorBox"></div>
+      <div class="gameover-banner" id="gameoverBanner" hidden>GAME OVER</div>
+    </div>
   </div>
 
 </div>
@@ -1387,29 +1564,399 @@ body.mode-magi {
 (() => {
   "use strict";
   const body = document.body;
-  const viewConsole = document.getElementById("view-console");
-  const viewMagi = document.getElementById("view-magi");
-  const tabConsole = document.getElementById("tab-console");
-  const tabMagi = document.getElementById("tab-magi");
+  const views = {
+    console: document.getElementById("view-console"),
+    magi: document.getElementById("view-magi"),
+    tetris: document.getElementById("view-tetris")
+  };
+  const tabs = {
+    console: document.getElementById("tab-console"),
+    magi: document.getElementById("tab-magi"),
+    tetris: document.getElementById("tab-tetris")
+  };
+  const MODES = Object.keys(views);
   const LS_KEY = "jev_active_mode";
 
   function setMode(mode) {
-    const isConsole = mode !== "magi";
-    body.classList.toggle("mode-console", isConsole);
-    body.classList.toggle("mode-magi", !isConsole);
-    viewConsole.hidden = !isConsole;
-    viewMagi.hidden = isConsole;
-    tabConsole.setAttribute("aria-pressed", String(isConsole));
-    tabMagi.setAttribute("aria-pressed", String(!isConsole));
-    try { localStorage.setItem(LS_KEY, isConsole ? "console" : "magi"); } catch (e) {}
+    if (!MODES.includes(mode)) mode = "console";
+    for (const m of MODES) {
+      const active = m === mode;
+      body.classList.toggle("mode-" + m, active);
+      views[m].hidden = !active;
+      tabs[m].setAttribute("aria-pressed", String(active));
+    }
+    try { localStorage.setItem(LS_KEY, mode); } catch (e) {}
   }
 
-  tabConsole.addEventListener("click", () => setMode("console"));
-  tabMagi.addEventListener("click", () => setMode("magi"));
+  for (const m of MODES) {
+    tabs[m].addEventListener("click", () => setMode(m));
+  }
 
   let saved = null;
   try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
-  setMode(saved === "magi" ? "magi" : "console");
+  setMode(MODES.includes(saved) ? saved : "console");
+})();
+
+</script>
+<script>
+
+(() => {
+  "use strict";
+
+  // ---------- pure game logic ----------
+  const ROWS = 20, COLS = 10, CELL = 24;
+
+  const BASE_SHAPES = {
+    I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+    O: [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    T: [[0,1,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+    S: [[0,1,1,0],[1,1,0,0],[0,0,0,0],[0,0,0,0]],
+    Z: [[1,1,0,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    J: [[1,0,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+    L: [[0,0,1,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]]
+  };
+  const PIECE_COLORS = {
+    I: "#5ee6f5", O: "#f5df5e", T: "#c07bf0", S: "#7bf09a",
+    Z: "#f0687b", J: "#6b8ff5", L: "#f5a35e"
+  };
+
+  function rotateMatrix(m) {
+    const n = 4;
+    const out = Array.from({length:n}, () => Array(n).fill(0));
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) out[x][n-1-y] = m[y][x];
+    return out;
+  }
+  function cellsOf(matrix) {
+    const cells = [];
+    for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) if (matrix[y][x]) cells.push({x, y});
+    return cells;
+  }
+  function normalizedShapeKey(matrix) {
+    const cells = cellsOf(matrix);
+    const minX = Math.min(...cells.map(c => c.x));
+    const minY = Math.min(...cells.map(c => c.y));
+    return cells.map(c => `${c.x - minX},${c.y - minY}`).sort().join('|');
+  }
+  function getRotations(type) {
+    const rotations = [];
+    let m = BASE_SHAPES[type];
+    const seen = new Set();
+    for (let i = 0; i < 4; i++) {
+      const key = normalizedShapeKey(m);
+      if (!seen.has(key)) { seen.add(key); rotations.push(m); }
+      m = rotateMatrix(m);
+    }
+    return rotations;
+  }
+  function createEmptyBoard() {
+    return Array.from({length: ROWS}, () => Array(COLS).fill(null));
+  }
+  function collision(board, cells, offX, offY) {
+    for (const c of cells) {
+      const gx = offX + c.x, gy = offY + c.y;
+      if (gx < 0 || gx >= COLS || gy >= ROWS) return true;
+      if (gy >= 0 && board[gy][gx]) return true;
+    }
+    return false;
+  }
+  function dropY(board, cells, x) {
+    let y = -4;
+    while (collision(board, cells, x, y)) y++;
+    while (!collision(board, cells, x, y + 1)) y++;
+    return y;
+  }
+  function cloneBoard(board) { return board.map(row => row.slice()); }
+  function placeCells(board, cells, offX, offY, color) {
+    for (const c of cells) {
+      const gx = offX + c.x, gy = offY + c.y;
+      if (gy >= 0 && gy < ROWS && gx >= 0 && gx < COLS) board[gy][gx] = color;
+    }
+  }
+  function clearLines(board) {
+    let cleared = 0;
+    const kept = board.filter(row => {
+      const full = row.every(cell => cell !== null);
+      if (full) cleared++;
+      return !full;
+    });
+    while (kept.length < ROWS) kept.unshift(Array(COLS).fill(null));
+    return { board: kept, cleared };
+  }
+  function computeMetrics(board) {
+    const heights = Array(COLS).fill(0);
+    for (let x = 0; x < COLS; x++) {
+      for (let y = 0; y < ROWS; y++) {
+        if (board[y][x]) { heights[x] = ROWS - y; break; }
+      }
+    }
+    const aggregateHeight = heights.reduce((a,b) => a+b, 0);
+    let bumpiness = 0;
+    for (let i = 0; i < COLS - 1; i++) bumpiness += Math.abs(heights[i] - heights[i+1]);
+    let holes = 0;
+    for (let x = 0; x < COLS; x++) {
+      let seenBlock = false;
+      for (let y = 0; y < ROWS; y++) {
+        if (board[y][x]) seenBlock = true;
+        else if (seenBlock) holes++;
+      }
+    }
+    return { aggregateHeight, bumpiness, holes };
+  }
+  function generateCandidates(board, type) {
+    const rotations = getRotations(type);
+    const candidates = [];
+    rotations.forEach((matrix, rotIndex) => {
+      const cells = cellsOf(matrix);
+      const xs = cells.map(c => c.x);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      for (let x = -minX; x <= COLS - 1 - maxX; x++) {
+        const landY = dropY(board, cells, x);
+        const test = cloneBoard(board);
+        placeCells(test, cells, x, landY, type);
+        const { board: cleared, cleared: linesCleared } = clearLines(test);
+        const metrics = computeMetrics(cleared);
+        candidates.push({ rotIndex, x, landY, cells, linesCleared, ...metrics });
+      }
+    });
+    return candidates;
+  }
+
+  // ---------- 7-bag randomizer ----------
+  let bag = [];
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function nextType() {
+    if (bag.length === 0) bag = shuffle(['I','O','T','S','Z','J','L']);
+    return bag.pop();
+  }
+
+  // ---------- game state ----------
+  let board = createEmptyBoard();
+  let score = 0, linesTotal = 0, piecesTotal = 0;
+  let isRunning = false;
+  let isBusy = false; // true while thinking/animating, to prevent overlapping loops
+
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+  const statScore = document.getElementById("statScore");
+  const statLines = document.getElementById("statLines");
+  const statPieces = document.getElementById("statPieces");
+  const thinkingDot = document.getElementById("thinkingDot");
+  const thinkingText = document.getElementById("thinkingText");
+  const lastMove = document.getElementById("lastMove");
+  const errorBox = document.getElementById("tetrisErrorBox");
+  const gameoverBanner = document.getElementById("gameoverBanner");
+  const startBtn = document.getElementById("startBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const skipAnim = document.getElementById("skipAnim");
+
+  function setThinking(on, label) {
+    thinkingDot.classList.toggle("active", !!on);
+    thinkingText.textContent = label || (on ? "考え中..." : "待機中");
+  }
+
+  function drawCell(gx, gy, color) {
+    const px = gx * CELL, py = gy * CELL;
+    ctx.fillStyle = color;
+    ctx.fillRect(px + 1, py + 1, CELL - 2, CELL - 2);
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.fillRect(px + 1, py + 1, CELL - 2, 4);
+  }
+
+  function render(activePiece) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    for (let x = 0; x <= COLS; x++) {
+      ctx.beginPath(); ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, ROWS * CELL); ctx.stroke();
+    }
+    for (let y = 0; y <= ROWS; y++) {
+      ctx.beginPath(); ctx.moveTo(0, y * CELL); ctx.lineTo(COLS * CELL, y * CELL); ctx.stroke();
+    }
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        if (board[y][x]) drawCell(x, y, PIECE_COLORS[board[y][x]] || "#888");
+      }
+    }
+    if (activePiece) {
+      const { cells, x, y, type } = activePiece;
+      for (const c of cells) {
+        const gy = y + c.y;
+        if (gy >= 0) drawCell(x + c.x, gy, PIECE_COLORS[type]);
+      }
+    }
+  }
+
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeInCubic(t) { return t * t * t; }
+
+  function animateMove(type, cells, fromX, targetX, targetY, duration) {
+    return new Promise((resolve) => {
+      if (duration <= 0) { resolve(); return; }
+      const start = performance.now();
+      const slideEnd = duration * 0.45;
+      function frame(now) {
+        const elapsed = now - start;
+        let curX, curY;
+        if (elapsed <= slideEnd) {
+          const t = easeOutCubic(Math.min(1, elapsed / slideEnd));
+          curX = fromX + (targetX - fromX) * t;
+          curY = 0;
+        } else {
+          curX = targetX;
+          const t = easeInCubic(Math.min(1, (elapsed - slideEnd) / (duration - slideEnd)));
+          curY = targetY * t;
+        }
+        render({ type, cells, x: Math.round(curX), y: curY });
+        if (elapsed < duration) requestAnimationFrame(frame);
+        else resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  function buildJevRequest(type, candidates) {
+    const criteria = {};
+    candidates.forEach((c, i) => {
+      criteria["c" + i] = `高さ合計=${c.aggregateHeight}, 穴の数=${c.holes}, 凹凸=${c.bumpiness}, 消去ライン=${c.linesCleared}`;
+    });
+    return {
+      state: `テトリスの盤面。落ちてくるピースは${type}。各候補は配置後の盤面指標を表す(高さ合計・穴の数・凹凸は小さいほど良く、消去ラインは大きいほど良い)。`,
+      questions: {
+        move: {
+          type: "choice",
+          instructions: "最も盤面を良い状態に保てる配置を1つ選んでください。穴を作らず、高さを低く、凹凸を減らし、可能ならラインを消せる配置を優先してください。",
+          criteria
+        }
+      }
+    };
+  }
+
+  async function askJev(type, candidates) {
+    const res = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildJevRequest(type, candidates))
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch (e) { json = null; }
+    if (!res.ok || json === null) {
+      throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
+    }
+    const ans = json.answers && json.answers.move;
+    if (!ans || typeof ans.choice !== "string") {
+      throw new Error("Jevの応答から choice が取得できませんでした: " + JSON.stringify(json));
+    }
+    const idx = parseInt(ans.choice.replace("c", ""), 10);
+    if (Number.isNaN(idx) || !candidates[idx]) {
+      // フォールバック: パースできなければ最初の候補を使う
+      return { candidate: candidates[0], confidence: ans.confidence, raw: ans };
+    }
+    return { candidate: candidates[idx], confidence: ans.confidence, raw: ans };
+  }
+
+  function showError(msg) {
+    errorBox.innerHTML = '<div class="error-box"><strong>停止しました</strong><br>' +
+      String(msg).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])) + '</div>';
+  }
+  function clearError() { errorBox.innerHTML = ""; }
+
+  async function step() {
+    if (isBusy || !isRunning) return;
+    isBusy = true;
+    clearError();
+
+    const type = nextType();
+    const rotations = getRotations(type);
+    const baseCells = cellsOf(rotations[0]);
+    const spawnX = Math.floor(COLS / 2) - 2;
+
+    if (collision(board, baseCells, spawnX, 0)) {
+      isRunning = false;
+      isBusy = false;
+      gameoverBanner.hidden = false;
+      setThinking(false, "ゲームオーバー");
+      startBtn.textContent = "開始";
+      return;
+    }
+
+    render({ type, cells: baseCells, x: spawnX, y: 0 });
+    setThinking(true, "Jevが" + type + "ピースを審議中...");
+
+    try {
+      const candidates = generateCandidates(board, type);
+      const { candidate, confidence } = await askJev(type, candidates);
+      const chosenCells = candidate.cells;
+      const duration = skipAnim.checked ? 0 : 550;
+
+      await animateMove(type, chosenCells, spawnX, candidate.x, (candidate.landY) * CELL, duration);
+
+      placeCells(board, chosenCells, candidate.x, candidate.landY, type);
+      const { board: clearedBoard, cleared } = clearLines(board);
+      board = clearedBoard;
+
+      piecesTotal++;
+      linesTotal += cleared;
+      score += [0, 100, 300, 500, 800][cleared] || 0;
+      statScore.textContent = score;
+      statLines.textContent = linesTotal;
+      statPieces.textContent = piecesTotal;
+
+      lastMove.innerHTML = `<b>${type}</b> → 回転${candidate.rotIndex} / x=${candidate.x}` +
+        (cleared ? ` / <b>${cleared}ライン消去!</b>` : "") +
+        (typeof confidence === "number" ? ` / confidence ${Math.round(confidence*100)}%` : "");
+
+      render(null);
+      setThinking(false, isRunning ? "待機中" : "一時停止");
+    } catch (err) {
+      isRunning = false;
+      startBtn.textContent = "開始";
+      setThinking(false, "エラーで停止");
+      showError(err && err.message ? err.message : String(err));
+    } finally {
+      isBusy = false;
+      if (isRunning) setTimeout(step, 250);
+    }
+  }
+
+  function reset() {
+    isRunning = false;
+    isBusy = false;
+    board = createEmptyBoard();
+    bag = [];
+    score = 0; linesTotal = 0; piecesTotal = 0;
+    statScore.textContent = "0";
+    statLines.textContent = "0";
+    statPieces.textContent = "0";
+    lastMove.textContent = "まだありません";
+    gameoverBanner.hidden = true;
+    startBtn.textContent = "開始";
+    clearError();
+    setThinking(false, "待機中");
+    render(null);
+  }
+
+  startBtn.addEventListener("click", () => {
+    if (isRunning) {
+      isRunning = false;
+      startBtn.textContent = "再開";
+      setThinking(false, "一時停止");
+    } else {
+      isRunning = true;
+      startBtn.textContent = "一時停止";
+      gameoverBanner.hidden = true;
+      if (!isBusy) step();
+    }
+  });
+  resetBtn.addEventListener("click", reset);
+
+  reset();
 })();
 
 </script>
