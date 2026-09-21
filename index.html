@@ -1050,6 +1050,109 @@ body.mode-ime {
     padding: 30px 10px;
   }
 
+#view-runner {
+    --sky-top: oklch(78% 0.10 240);
+    --sky-bottom: oklch(88% 0.07 200);
+    --ground: oklch(55% 0.10 140);
+    --ground-dark: oklch(42% 0.09 140);
+    --panel: oklch(99% 0.003 100);
+    --border: oklch(85% 0.01 100);
+    --text: oklch(22% 0.01 100);
+    --text-dim: oklch(48% 0.01 100);
+    --accent: oklch(60% 0.18 30);
+    --accent-soft: oklch(93% 0.05 30);
+    --gold: oklch(80% 0.15 90);
+    --danger: oklch(55% 0.20 25);
+    --danger-soft: oklch(93% 0.06 25);
+    --success: oklch(58% 0.15 150);
+    --success-soft: oklch(93% 0.05 150);
+  }
+@media (prefers-color-scheme: dark) {#view-runner {
+      --panel: oklch(22% 0.012 100);
+      --border: oklch(34% 0.014 100);
+      --text: oklch(92% 0.006 100);
+      --text-dim: oklch(70% 0.01 100);
+      --accent-soft: oklch(30% 0.06 30);
+      --danger-soft: oklch(28% 0.07 25);
+      --success-soft: oklch(28% 0.06 150);
+    }}
+#view-runner * { box-sizing: border-box; }
+body.mode-runner { margin: 0; padding: 0; }
+body.mode-runner {
+    min-height: 100vh;
+    background: var(--panel);
+    color: var(--text);
+    font: 400 15px/1.5 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 32px) clamp(14px, 4vw, 24px) 64px;
+  }
+#view-runner .wrap { max-width: 760px; margin: 0 auto; }
+#view-runner header { text-align: center; margin-bottom: 14px; }
+#view-runner header h1 { margin: 0; font-size: clamp(1.3rem, 4vw, 1.7rem); font-weight: 800; letter-spacing: -0.01em; }
+#view-runner header p { margin: 4px 0 0; font-size: 0.82rem; color: var(--text-dim); }
+#view-runner .stage-frame {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px oklch(0% 0 0 / 0.12);
+    margin-bottom: 14px;
+  }
+#view-runner canvas#stage { display: block; width: 100%; height: auto; background: var(--sky-bottom); }
+#view-runner .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+#view-runner button {
+    font: 700 0.84rem/1.4 inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    padding: 9px 16px;
+    border-radius: 8px;
+    transition: transform 90ms ease-out, background 150ms ease;
+  }
+#view-runner button:hover { background: var(--accent-soft); }
+#view-runner button:active { transform: scale(0.96); }
+#view-runner button:disabled { opacity: 0.45; cursor: not-allowed; }
+#view-runner button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#view-runner button.primary { background: var(--accent); color: white; border-color: transparent; }
+#view-runner button.primary:hover { filter: brightness(1.06); }
+#view-runner .status-banner {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+#view-runner .status-banner.thinking { background: var(--accent-soft); color: var(--accent); }
+#view-runner .status-banner.clear { background: var(--success-soft); color: var(--success); }
+#view-runner .status-banner.dead { background: var(--danger-soft); color: var(--danger); }
+#view-runner .error-box {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+#view-runner .log {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+#view-runner .log-chip {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text-dim);
+    opacity: 0.4;
+  }
+#view-runner .log-chip.current { opacity: 1; background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+#view-runner .log-chip.ok { opacity: 1; background: var(--success-soft); color: var(--success); border-color: transparent; }
+#view-runner .log-chip.fail { opacity: 1; background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+
 </style>
 </head>
 <body class="mode-console">
@@ -1060,6 +1163,7 @@ body.mode-ime {
   <button id="tab-tetris" type="button" aria-pressed="false">JEV TETRIS</button>
   <button id="tab-mail" type="button" aria-pressed="false">MAIL SORT</button>
   <button id="tab-ime" type="button" aria-pressed="false">ROMAJI IME</button>
+  <button id="tab-runner" type="button" aria-pressed="false">PIXEL RUNNER</button>
 </div>
 
 <div class="view" id="view-console">
@@ -1296,6 +1400,30 @@ body.mode-ime {
   <div class="transcript" id="transcript">
     <div class="empty-hint" id="emptyHint">変換すると、ここに確定した文章が積み重なっていきます。<br>紫色の「AI」マーク付きの単語は、Jevが前後の文脈から漢字を選んだ部分です。</div>
   </div>
+
+</div>
+</div>
+
+<div class="view" id="view-runner" hidden>
+<div class="wrap">
+
+  <header>
+    <h1>PIXEL RUNNER</h1>
+    <p>各区画の状況をまとめてJevに判断させ、その行動プランどおりに自動で走り抜けるデモ</p>
+  </header>
+
+  <div class="stage-frame">
+    <canvas id="stage" width="760" height="220"></canvas>
+  </div>
+
+  <div class="toolbar">
+    <button class="primary" id="runnerStartBtn">Jevに判断させて開始</button>
+    <button id="newLevelBtn">コースを変える</button>
+  </div>
+
+  <div id="statusBanner" class="status-banner" hidden></div>
+  <div id="runnerErrorBox"></div>
+  <div class="log" id="log"></div>
 
 </div>
 </div>
@@ -1931,14 +2059,16 @@ body.mode-ime {
     magi: document.getElementById("view-magi"),
     tetris: document.getElementById("view-tetris"),
     mail: document.getElementById("view-mail"),
-    ime: document.getElementById("view-ime")
+    ime: document.getElementById("view-ime"),
+    runner: document.getElementById("view-runner")
   };
   const tabs = {
     console: document.getElementById("tab-console"),
     magi: document.getElementById("tab-magi"),
     tetris: document.getElementById("tab-tetris"),
     mail: document.getElementById("tab-mail"),
-    ime: document.getElementById("tab-ime")
+    ime: document.getElementById("tab-ime"),
+    runner: document.getElementById("tab-runner")
   };
   const MODES = Object.keys(views);
   const LS_KEY = "jev_active_mode";
@@ -2905,6 +3035,382 @@ body.mode-ime {
     statusLine.textContent = "";
     clearError();
   });
+})();
+
+</script>
+<script>
+
+(() => {
+  "use strict";
+
+  // ---------- レベルロジック ----------
+  const CORRECT_ACTION = { gap: 'jump', enemy_ground: 'jump', enemy_flying: 'duck', coin: 'jump', clear: 'run' };
+  const FATAL = { gap: true, enemy_ground: true, enemy_flying: true, coin: false, clear: false };
+  const DESCRIPTIONS = {
+    gap: '前方の地面が途切れており、穴が開いている。ジャンプしないと穴に落ちてしまう。',
+    enemy_ground: '前方の地面に敵が歩いている。ジャンプして飛び越えないとぶつかってしまう。',
+    enemy_flying: '前方に低空飛行する敵がいる。しゃがまないと頭にぶつかってしまう。ジャンプすると避けられずぶつかる。',
+    coin: '前方の空中にコインが浮いている。ジャンプすれば取れるが、取らなくても危険はない。',
+    clear: '前方の地面は平坦で、特に障害物はない。そのまま走り続ければよい。'
+  };
+  const ACTIONS_JA = { jump: 'ジャンプする', duck: 'しゃがむ', run: '何もせずそのまま走る' };
+  const NUM_SEGMENTS = 12;
+  const SEG_WIDTH = 200;
+
+  function seededRandom(seed) {
+    let s = seed >>> 0;
+    return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  }
+  function generateLevel(numSegments, seed) {
+    const rand = seededRandom(seed);
+    const weights = { gap: 3, enemy_ground: 3, enemy_flying: 2, coin: 3, clear: 2 };
+    const pool = [];
+    for (const [type, w] of Object.entries(weights)) for (let i = 0; i < w; i++) pool.push(type);
+    const segments = [];
+    for (let i = 0; i < numSegments; i++) {
+      const type = pool[Math.floor(rand() * pool.length)];
+      segments.push({ index: i, type, description: DESCRIPTIONS[type] });
+    }
+    return segments;
+  }
+  function buildLevelRequest(segments) {
+    const questions = {};
+    segments.forEach(seg => {
+      questions['s' + seg.index] = {
+        type: 'choice',
+        instructions: `${seg.index + 1}区画目の状況: ${seg.description} このときキャラクターが取るべき行動を選んでください。`,
+        criteria: ACTIONS_JA
+      };
+    });
+    return {
+      state: `横スクロールアクションゲームのコース。全${segments.length}区画を順番に通過する。各区画ごとに最適な行動を1つ選ぶ。`,
+      questions
+    };
+  }
+
+  // ---------- UI要素 ----------
+  const canvas = document.getElementById("stage");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const startBtn = document.getElementById("runnerStartBtn");
+  const newLevelBtn = document.getElementById("newLevelBtn");
+  const statusBanner = document.getElementById("statusBanner");
+  const errorBox = document.getElementById("runnerErrorBox");
+  const logEl = document.getElementById("log");
+
+  let seed = Math.floor(Math.random() * 1e9);
+  let level = generateLevel(NUM_SEGMENTS, seed);
+  let actionsByIndex = {};
+  let running = false;
+
+  function esc(s) { return String(s ?? "").replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c])); }
+
+  function renderLog(currentIdx, outcomes) {
+    logEl.innerHTML = level.map(seg => {
+      let cls = "log-chip";
+      if (outcomes[seg.index] === "ok") cls += " ok";
+      else if (outcomes[seg.index] === "fail") cls += " fail";
+      else if (seg.index === currentIdx) cls += " current";
+      const label = { gap:"穴", enemy_ground:"敵", enemy_flying:"飛敵", coin:"コイン", clear:"平地" }[seg.type];
+      const act = actionsByIndex[seg.index] ? ({jump:"跳",duck:"伏",run:"走"}[actionsByIndex[seg.index]]) : "?";
+      return `<span class="${cls}">${seg.index+1}:${label}(${act})</span>`;
+    }).join("");
+  }
+
+  function setBanner(kind, text) {
+    statusBanner.hidden = false;
+    statusBanner.className = "status-banner " + kind;
+    statusBanner.textContent = text;
+  }
+  function clearError() { errorBox.innerHTML = ""; }
+  function showError(msg) { errorBox.innerHTML = '<div class="error-box"><strong>失敗:</strong> ' + esc(msg) + '</div>'; }
+
+  // ---------- 描画(汎用ピクセルアート、特定作品のキャラクター意匠は使用しない) ----------
+  const GROUND_Y = H - 46;
+  const PLAYER_X = 90;
+
+  function drawBackground(camX) {
+    const grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+    grad.addColorStop(0, "#9fd6f2");
+    grad.addColorStop(1, "#d8ecf7");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, GROUND_Y);
+    // 雲(視差スクロール)
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    for (let i = 0; i < 6; i++) {
+      const cx = ((i * 260 - camX * 0.3) % (W + 300) + (W + 300)) % (W + 300) - 100;
+      const cy = 30 + (i % 3) * 22;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 26, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx + 22, cy + 4, 20, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawGroundStrip(camX, levelWidth) {
+    ctx.fillStyle = "#7bbf6a";
+    ctx.fillRect(-camX, GROUND_Y, levelWidth, 10);
+    ctx.fillStyle = "#8a6a45";
+    ctx.fillRect(-camX, GROUND_Y + 10, levelWidth, H - GROUND_Y - 10);
+  }
+
+  function drawGap(x, width) {
+    ctx.fillStyle = "var(--sky-bottom)".startsWith("var") ? "#d8ecf7" : "#d8ecf7";
+    ctx.fillRect(x, GROUND_Y, width, H - GROUND_Y);
+  }
+
+  function drawGroundEnemy(x, walkPhase) {
+    const y = GROUND_Y;
+    const bob = Math.sin(walkPhase) * 2;
+    ctx.fillStyle = "#b5563c";
+    ctx.beginPath();
+    ctx.ellipse(x, y - 14 + bob, 16, 13, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#3a2418";
+    ctx.beginPath(); ctx.arc(x - 6, y - 16 + bob, 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 6, y - 16 + bob, 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#8a3b28";
+    ctx.fillRect(x - 12, y - 3 + bob, 8, 6);
+    ctx.fillRect(x + 4, y - 3 + bob, 8, 6);
+  }
+
+  function drawFlyingEnemy(x, t) {
+    const y = GROUND_Y - 58 + Math.sin(t) * 6;
+    ctx.fillStyle = "#7b5cb0";
+    ctx.beginPath();
+    ctx.ellipse(x, y, 14, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    const flap = Math.sin(t * 3) * 10;
+    ctx.fillStyle = "#a086d6";
+    ctx.beginPath(); ctx.ellipse(x - 10, y - flap, 10, 5, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 10, y - flap, 10, 5, -0.4, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawCoin(x, collected, t) {
+    if (collected) return;
+    const y = GROUND_Y - 46 + Math.sin(t * 2) * 4;
+    const squash = Math.abs(Math.cos(t * 2));
+    ctx.fillStyle = "#f0c419";
+    ctx.beginPath();
+    ctx.ellipse(x, y, 9 * Math.max(0.3, squash), 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#c79a0e";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  function drawPlayer(y, ducking, dead, t) {
+    ctx.save();
+    ctx.translate(PLAYER_X, y);
+    if (dead) ctx.rotate(Math.PI / 2);
+    const h = ducking ? 18 : 30;
+    const w = ducking ? 22 : 16;
+    ctx.fillStyle = dead ? "#999" : "#e2533d";
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(-w/2, -h, w, h, 6) : ctx.rect(-w/2, -h, w, h);
+    ctx.fill();
+    ctx.fillStyle = dead ? "#777" : "#f4c9a0";
+    ctx.beginPath();
+    ctx.arc(0, -h - 6, 8, 0, Math.PI * 2);
+    ctx.fill();
+    if (!dead) {
+      ctx.fillStyle = "#2a2a2a";
+      ctx.beginPath(); ctx.arc(3, -h - 7, 1.4, 0, Math.PI * 2); ctx.fill();
+    }
+    if (!ducking && !dead) {
+      const legSwing = Math.sin(t * 12) * 6;
+      ctx.strokeStyle = "#e2533d";
+      ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(-4 + legSwing, 8); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(4 - legSwing, 8); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function segCenterX(idx) { return idx * SEG_WIDTH + SEG_WIDTH / 2; }
+  function segObstacleX(idx) { return idx * SEG_WIDTH + SEG_WIDTH * 0.62; }
+
+  // ---------- 実行 ----------
+  function buildOutcomes() {
+    const outcomes = {};
+    for (const seg of level) {
+      const chosen = actionsByIndex[seg.index];
+      const correct = CORRECT_ACTION[seg.type];
+      outcomes[seg.index] = (chosen === correct) ? "ok" : (FATAL[seg.type] ? "fail" : "ok");
+    }
+    return outcomes;
+  }
+
+  function playRun() {
+    const levelWidth = level.length * SEG_WIDTH + 300;
+    const speed = 2.6; // px/frame
+    let camX = 0;
+    let playerY = GROUND_Y;
+    let vy = 0;
+    let ducking = false;
+    let dead = false;
+    let deadAt = null;
+    let coinsCollected = new Set();
+    let t = 0;
+    const GRAVITY = 0.9;
+    const JUMP_VY = -13;
+    const groundLevel = GROUND_Y;
+
+    const outcomes = {};
+
+    function currentSegmentIndex() {
+      return Math.min(level.length - 1, Math.floor((camX + PLAYER_X) / SEG_WIDTH));
+    }
+
+    function frame() {
+      t += 0.06;
+      camX += speed;
+      const segIdx = currentSegmentIndex();
+      const seg = level[segIdx];
+      const action = actionsByIndex[seg.index];
+      const obstacleWorldX = segObstacleX(seg.index);
+      const distToObstacle = obstacleWorldX - (camX + PLAYER_X);
+
+      // アクションのトリガー(障害物の手前で行動を開始)
+      if (!dead) {
+        if (action === "jump" && distToObstacle < 46 && distToObstacle > 10 && vy === 0 && playerY === groundLevel) {
+          vy = JUMP_VY;
+        }
+        if (action === "duck") {
+          ducking = distToObstacle < 60 && distToObstacle > -30;
+        } else {
+          ducking = false;
+        }
+
+        // 物理
+        if (vy !== 0 || playerY !== groundLevel) {
+          vy += GRAVITY;
+          playerY += vy;
+          if (playerY >= groundLevel) { playerY = groundLevel; vy = 0; }
+        }
+
+        // 判定(障害物地点を通過するタイミングで成否確定)
+        if (Math.abs(distToObstacle) < 4 && outcomes[seg.index] === undefined) {
+          const type = seg.type;
+          let ok;
+          if (type === "gap") ok = playerY < groundLevel - 6;
+          else if (type === "enemy_ground") ok = playerY < groundLevel - 10;
+          else if (type === "enemy_flying") ok = ducking;
+          else if (type === "coin") { ok = true; if (playerY < groundLevel - 10) coinsCollected.add(seg.index); }
+          else ok = true;
+
+          outcomes[seg.index] = ok ? "ok" : "fail";
+          if (!ok && FATAL[type]) { dead = true; deadAt = seg.index; }
+        }
+      }
+
+      // ---- 描画 ----
+      ctx.clearRect(0, 0, W, H);
+      drawBackground(camX);
+      drawGroundStrip(camX, levelWidth);
+
+      ctx.save();
+      ctx.translate(-camX, 0);
+      level.forEach(s => {
+        const ox = segObstacleX(s.index);
+        if (s.type === "gap") drawGap(ox - 28, 56);
+        else if (s.type === "enemy_ground" && outcomes[s.index] === undefined) drawGroundEnemy(ox, t * 4 + s.index);
+        else if (s.type === "enemy_flying" && outcomes[s.index] === undefined) drawFlyingEnemy(ox, t * 2 + s.index);
+        else if (s.type === "coin") drawCoin(ox, coinsCollected.has(s.index), t + s.index);
+      });
+      ctx.restore();
+
+      drawPlayer(playerY, ducking, dead, t);
+
+      renderLog(seg.index, outcomes);
+
+      if (dead) {
+        setBanner("dead", `${deadAt + 1}区画目(${{gap:"穴",enemy_ground:"敵",enemy_flying:"低空の敵"}[level[deadAt].type]})で失敗しました`);
+        finishRun(outcomes, false, coinsCollected.size);
+        return;
+      }
+      if (camX + PLAYER_X > levelWidth - 40) {
+        setBanner("clear", `コース クリア！ コイン ${coinsCollected.size} 枚獲得`);
+        finishRun(outcomes, true, coinsCollected.size);
+        return;
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function finishRun(outcomes, cleared, coins) {
+    running = false;
+    startBtn.disabled = false;
+    startBtn.textContent = "もう一度Jevに判断させる";
+    newLevelBtn.disabled = false;
+  }
+
+  async function askJev() {
+    const res = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildLevelRequest(level))
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch (e) { json = null; }
+    if (!res.ok || json === null) throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
+    const answers = json.answers || {};
+    const result = {};
+    level.forEach(seg => {
+      const ans = answers["s" + seg.index];
+      const valid = ["jump", "duck", "run"];
+      result[seg.index] = (ans && valid.includes(ans.choice)) ? ans.choice : "run";
+    });
+    return result;
+  }
+
+  async function start() {
+    if (running) return;
+    running = true;
+    startBtn.disabled = true;
+    newLevelBtn.disabled = true;
+    clearError();
+    setBanner("thinking", "Jevが全区画の行動プランを判断中...");
+    renderLog(-1, {});
+
+    try {
+      actionsByIndex = await askJev();
+      setBanner("thinking", "判断完了。プランどおりに走り抜けます...");
+      playRun();
+    } catch (err) {
+      running = false;
+      startBtn.disabled = false;
+      newLevelBtn.disabled = false;
+      statusBanner.hidden = true;
+      showError(err && err.message ? err.message : String(err));
+    }
+  }
+
+  function drawIdle() {
+    ctx.clearRect(0, 0, W, H);
+    drawBackground(0);
+    drawGroundStrip(0, W + 200);
+    drawPlayer(GROUND_Y, false, false, 0);
+  }
+
+  function newLevel() {
+    seed = Math.floor(Math.random() * 1e9);
+    level = generateLevel(NUM_SEGMENTS, seed);
+    actionsByIndex = {};
+    statusBanner.hidden = true;
+    clearError();
+    startBtn.textContent = "Jevに判断させて開始";
+    renderLog(-1, {});
+    drawIdle();
+  }
+
+  startBtn.addEventListener("click", start);
+  newLevelBtn.addEventListener("click", newLevel);
+
+  renderLog(-1, {});
+  drawIdle();
 })();
 
 </script>
