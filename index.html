@@ -892,6 +892,164 @@ body.mode-mail {
 #view-mail .mail-subject { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #view-mail .mail-snippet { font-size: 0.78rem; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+#view-ime {
+    --bg: oklch(96% 0.02 145);
+    --bg-2: oklch(93% 0.03 300);
+    --surface: oklch(99% 0.005 145);
+    --border: oklch(88% 0.02 145);
+    --text: oklch(28% 0.02 260);
+    --text-dim: oklch(50% 0.02 260);
+    --text-faint: oklch(64% 0.015 260);
+    --accent: oklch(62% 0.15 175);
+    --accent-2: oklch(68% 0.14 320);
+    --accent-soft: oklch(92% 0.05 175);
+    --ai-badge: oklch(60% 0.16 320);
+    --ai-badge-bg: oklch(93% 0.05 320);
+    --bubble-bg: oklch(99% 0.005 145);
+  }
+@media (prefers-color-scheme: dark) {#view-ime {
+      --bg: oklch(20% 0.02 260);
+      --bg-2: oklch(24% 0.03 280);
+      --surface: oklch(26% 0.015 260);
+      --border: oklch(36% 0.02 260);
+      --text: oklch(93% 0.006 260);
+      --text-dim: oklch(74% 0.01 260);
+      --text-faint: oklch(58% 0.01 260);
+      --accent: oklch(74% 0.13 175);
+      --accent-2: oklch(76% 0.12 320);
+      --accent-soft: oklch(34% 0.05 175);
+      --ai-badge: oklch(76% 0.13 320);
+      --ai-badge-bg: oklch(33% 0.06 320);
+      --bubble-bg: oklch(26% 0.015 260);
+    }}
+#view-ime * { box-sizing: border-box; }
+body.mode-ime { margin: 0; padding: 0; }
+body.mode-ime {
+    min-height: 100vh;
+    background: radial-gradient(1000px 500px at 15% -10%, var(--bg-2), var(--bg));
+    color: var(--text);
+    font: 400 15px/1.6 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(16px, 4vw, 32px) clamp(14px, 4vw, 24px) 64px;
+  }
+#view-ime .wrap { max-width: 700px; margin: 0 auto; }
+#view-ime header { margin-bottom: 16px; }
+#view-ime header h1 { margin: 0; font-size: clamp(1.3rem, 4vw, 1.7rem); font-weight: 800; letter-spacing: -0.01em; }
+#view-ime header p { margin: 4px 0 0; font-size: 0.82rem; color: var(--text-dim); }
+#view-ime .examples { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+#view-ime .examples button {
+    font: 600 0.75rem/1.4 inherit;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+#view-ime .examples button:hover { background: var(--accent-soft); color: var(--text); }
+#view-ime .composer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+#view-ime .composer input[type="text"] {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    padding: 6px 2px;
+  }
+#view-ime .preview {
+    font-size: 0.88rem;
+    color: var(--accent);
+    min-height: 1.4em;
+    padding: 2px 2px 8px;
+    border-bottom: 1px dashed var(--border);
+    margin-bottom: 8px;
+  }
+#view-ime .composer-actions { display: flex; justify-content: flex-end; gap: 8px; }
+#view-ime button.primary {
+    font: 700 0.85rem/1.4 inherit;
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    transition: transform 90ms ease-out, filter 150ms ease;
+  }
+#view-ime button.primary:hover { filter: brightness(1.07); }
+#view-ime button.primary:active { transform: scale(0.96); }
+#view-ime button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+#view-ime button.ghost {
+    font: 600 0.8rem/1.4 inherit;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+#view-ime button.ghost:hover { background: var(--accent-soft); }
+#view-ime button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#view-ime .status-line {
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    min-height: 1.2em;
+    margin: -6px 0 12px 2px;
+  }
+#view-ime .error-box {
+    border: 1px solid var(--accent-2);
+    color: var(--accent-2);
+    background: var(--ai-badge-bg);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+#view-ime .transcript { display: flex; flex-direction: column; gap: 10px; }
+#view-ime .bubble {
+    background: var(--bubble-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    line-height: 1.9;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 350ms ease, transform 350ms ease;
+  }
+#view-ime .bubble.in { opacity: 1; transform: translateY(0); }
+#view-ime .bubble .romaji-src { display: block; font-size: 0.7rem; color: var(--text-faint); margin-bottom: 4px; }
+#view-ime .ai-word {
+    position: relative;
+    background: var(--ai-badge-bg);
+    color: var(--ai-badge);
+    border-radius: 5px;
+    padding: 0 3px;
+    cursor: help;
+    font-weight: 700;
+  }
+#view-ime .ai-word::after {
+    content: "AI";
+    position: relative;
+    top: -0.6em;
+    font-size: 0.55em;
+    margin-left: 1px;
+    font-weight: 800;
+  }
+#view-ime .empty-hint {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    padding: 30px 10px;
+  }
+
 </style>
 </head>
 <body class="mode-console">
@@ -901,6 +1059,7 @@ body.mode-mail {
   <button id="tab-magi" type="button" aria-pressed="false">MAGI SYSTEM</button>
   <button id="tab-tetris" type="button" aria-pressed="false">JEV TETRIS</button>
   <button id="tab-mail" type="button" aria-pressed="false">MAIL SORT</button>
+  <button id="tab-ime" type="button" aria-pressed="false">ROMAJI IME</button>
 </div>
 
 <div class="view" id="view-console">
@@ -1103,6 +1262,40 @@ body.mode-mail {
   <div id="mailErrorBox"></div>
 
   <div class="mail-list" id="mailList"></div>
+
+</div>
+</div>
+
+<div class="view" id="view-ime" hidden>
+<div class="wrap">
+
+  <header>
+    <h1>ROMAJI IME</h1>
+    <p>ローマ字入力→ひらがな変換はその場で、同音異義語の漢字選びだけJevが文脈から判断します</p>
+  </header>
+
+  <div class="examples" id="examples">
+    <button type="button" data-ex="kyou kami wo kirimashita">kyou kami wo kirimashita</button>
+    <button type="button" data-ex="hashi de hana wo mimashita">hashi de hana wo mimashita</button>
+    <button type="button" data-ex="tomodachi ni ashita aimasu">tomodachi ni ashita aimasu</button>
+    <button type="button" data-ex="kono hon wo tori ni ikimasu">kono hon wo tori ni ikimasu</button>
+  </div>
+
+  <div class="composer">
+    <input type="text" id="romajiInput" placeholder="ここにローマ字を入力(例: kyou gakkou de nihongo wo benkyou shimasu)" autocomplete="off" spellcheck="false">
+    <div class="preview" id="preview">&nbsp;</div>
+    <div class="composer-actions">
+      <button class="ghost" id="clearBtn">履歴をクリア</button>
+      <button class="primary" id="convertBtn">変換</button>
+    </div>
+  </div>
+
+  <div class="status-line" id="statusLine">&nbsp;</div>
+  <div id="imeErrorBox"></div>
+
+  <div class="transcript" id="transcript">
+    <div class="empty-hint" id="emptyHint">変換すると、ここに確定した文章が積み重なっていきます。<br>紫色の「AI」マーク付きの単語は、Jevが前後の文脈から漢字を選んだ部分です。</div>
+  </div>
 
 </div>
 </div>
@@ -1737,13 +1930,15 @@ body.mode-mail {
     console: document.getElementById("view-console"),
     magi: document.getElementById("view-magi"),
     tetris: document.getElementById("view-tetris"),
-    mail: document.getElementById("view-mail")
+    mail: document.getElementById("view-mail"),
+    ime: document.getElementById("view-ime")
   };
   const tabs = {
     console: document.getElementById("tab-console"),
     magi: document.getElementById("tab-magi"),
     tetris: document.getElementById("tab-tetris"),
-    mail: document.getElementById("tab-mail")
+    mail: document.getElementById("tab-mail"),
+    ime: document.getElementById("tab-ime")
   };
   const MODES = Object.keys(views);
   const LS_KEY = "jev_active_mode";
@@ -2442,6 +2637,274 @@ body.mode-mail {
   resetBtn.addEventListener("click", reset);
 
   reset();
+})();
+
+</script>
+<script>
+
+(() => {
+  "use strict";
+
+  // ---------- ローマ字 -> ひらがな ----------
+  const SMALL_Y = { a: 'ゃ', u: 'ゅ', o: 'ょ' };
+  const BASE = {
+    a:'あ', i:'い', u:'う', e:'え', o:'お',
+    ka:'か', ki:'き', ku:'く', ke:'け', ko:'こ',
+    sa:'さ', shi:'し', si:'し', su:'す', se:'せ', so:'そ',
+    ta:'た', chi:'ち', ti:'ち', tsu:'つ', tu:'つ', te:'て', to:'と',
+    na:'な', ni:'に', nu:'ぬ', ne:'ね', no:'の',
+    ha:'は', hi:'ひ', fu:'ふ', hu:'ふ', he:'へ', ho:'ほ',
+    ma:'ま', mi:'み', mu:'む', me:'め', mo:'も',
+    ya:'や', yu:'ゆ', yo:'よ',
+    ra:'ら', ri:'り', ru:'る', re:'れ', ro:'ろ',
+    wa:'わ', wo:'を', wi:'うぃ', we:'うぇ',
+    ga:'が', gi:'ぎ', gu:'ぐ', ge:'げ', go:'ご',
+    za:'ざ', ji:'じ', zi:'じ', zu:'ず', ze:'ぜ', zo:'ぞ',
+    da:'だ', di:'ぢ', du:'づ', de:'で', do:'ど',
+    ba:'ば', bi:'び', bu:'ぶ', be:'べ', bo:'ぼ',
+    pa:'ぱ', pi:'ぴ', pu:'ぷ', pe:'ぺ', po:'ぽ'
+  };
+  const YOUON_BASES = { ky:'き', sh:'し', ch:'ち', ny:'に', hy:'ひ', my:'み', ry:'り', gy:'ぎ', j:'じ', by:'び', py:'ぴ' };
+
+  function buildTable() {
+    const table = {};
+    for (const [k, v] of Object.entries(BASE)) table[k] = v;
+    for (const [prefix, kana] of Object.entries(YOUON_BASES)) {
+      for (const [vowel, smallY] of Object.entries(SMALL_Y)) {
+        if (prefix === 'j') table['j' + vowel] = 'じ' + smallY;
+        else if (prefix === 'sh') table['sh' + vowel] = 'し' + smallY;
+        else if (prefix === 'ch') table['ch' + vowel] = 'ち' + smallY;
+        else table[prefix + vowel] = kana + smallY;
+      }
+    }
+    return table;
+  }
+  const TABLE = buildTable();
+  const MAX_LEN = Math.max(...Object.keys(TABLE).map(k => k.length));
+  const CONSONANTS = 'bcdfghjklmnpqrstvwxyz';
+
+  function romajiToHiragana(input) {
+    const s = input.toLowerCase();
+    let out = '';
+    let i = 0;
+    while (i < s.length) {
+      if (i + 1 < s.length && CONSONANTS.includes(s[i]) && s[i] !== 'n' &&
+          (s[i] === s[i+1] || (s[i] === 't' && s[i+1] === 'c'))) {
+        out += 'っ'; i += 1; continue;
+      }
+      let matched = false;
+      for (let len = Math.min(MAX_LEN, s.length - i); len >= 1; len--) {
+        const chunk = s.slice(i, i + len);
+        if (TABLE[chunk]) { out += TABLE[chunk]; i += len; matched = true; break; }
+      }
+      if (matched) continue;
+      if (s[i] === 'n') {
+        const next = s[i+1];
+        if (next === 'n') { out += 'ん'; i += 1; continue; }
+        if (!next || !'aiueoy'.includes(next)) { out += 'ん'; i += 1; continue; }
+        out += 'ん'; i += 1; continue;
+      }
+      out += s[i]; i += 1;
+    }
+    return out;
+  }
+
+  // ---------- 辞書 ----------
+  const DICT = {
+    "かみ": [{k:"髪",g:"頭の毛"},{k:"紙",g:"書く/印刷する紙"},{k:"神",g:"神様"}],
+    "はし": [{k:"橋",g:"川にかける橋"},{k:"箸",g:"食事の箸"},{k:"端",g:"はし・へり"}],
+    "きく": [{k:"聞く",g:"音を聞く/尋ねる"},{k:"効く",g:"効果がある"},{k:"菊",g:"花の菊"}],
+    "かえる": [{k:"帰る",g:"家に帰る"},{k:"変える",g:"変化させる"},{k:"蛙",g:"カエル(生き物)"}],
+    "あける": [{k:"開ける",g:"開く"},{k:"明ける",g:"夜が明ける"},{k:"空ける",g:"空にする"}],
+    "いる": [{k:"居る",g:"人がいる"},{k:"要る",g:"必要である"}],
+    "とる": [{k:"取る",g:"手に取る"},{k:"撮る",g:"写真を撮る"},{k:"採る",g:"採取する"}],
+    "はな": [{k:"花",g:"植物の花"},{k:"鼻",g:"顔の鼻"}],
+    "あう": [{k:"会う",g:"人に会う"},{k:"合う",g:"サイズなどが合う"}],
+    "きる": [{k:"切る",g:"刃物で切る"},{k:"着る",g:"服を着る"}],
+    "なく": [{k:"泣く",g:"涙を流す"},{k:"鳴く",g:"動物が鳴く"}],
+    "うつ": [{k:"打つ",g:"たたく"},{k:"撃つ",g:"銃で撃つ"}],
+    "はやい": [{k:"早い",g:"時間が早い"},{k:"速い",g:"スピードが速い"}],
+    "あつい": [{k:"暑い",g:"気温が暑い"},{k:"熱い",g:"物が熱い"},{k:"厚い",g:"厚みがある"}],
+    "かわ": [{k:"川",g:"river"},{k:"皮",g:"皮膚・表皮"},{k:"革",g:"革製品のかわ"}],
+    "こえ": [{k:"声",g:"人の声"},{k:"肥え",g:"肥料/太る"}],
+    "みる": [{k:"見る",g:"目で見る"},{k:"診る",g:"診察する"}],
+
+    "わたし": [{k:"私"}], "ぼく": [{k:"僕"}], "ほん": [{k:"本"}], "がっこう": [{k:"学校"}],
+    "せんせい": [{k:"先生"}], "がくせい": [{k:"学生"}], "かいしゃ": [{k:"会社"}], "しごと": [{k:"仕事"}],
+    "きょう": [{k:"今日"}], "あした": [{k:"明日"}], "きのう": [{k:"昨日"}], "いま": [{k:"今"}],
+    "じかん": [{k:"時間"}], "でんわ": [{k:"電話"}], "でんしゃ": [{k:"電車"}], "くるま": [{k:"車"}],
+    "いえ": [{k:"家"}], "うち": [{k:"家"}], "がいこく": [{k:"外国"}], "にほん": [{k:"日本"}],
+    "にほんご": [{k:"日本語"}], "えいご": [{k:"英語"}], "ともだち": [{k:"友達"}], "かぞく": [{k:"家族"}],
+    "たべる": [{k:"食べる"}], "たべます": [{k:"食べます"}], "たべた": [{k:"食べた"}],
+    "のむ": [{k:"飲む"}], "のみます": [{k:"飲みます"}],
+    "いく": [{k:"行く"}], "いきます": [{k:"行きます"}], "いった": [{k:"行った"}],
+    "くる": [{k:"来る"}], "きます": [{k:"来ます"}], "きた": [{k:"来た"}],
+    "する": [{k:"する"}], "します": [{k:"します"}], "した": [{k:"した"}],
+    "はなす": [{k:"話す"}], "はなします": [{k:"話します"}],
+    "よむ": [{k:"読む"}], "よみます": [{k:"読みます"}],
+    "かく": [{k:"書く"}], "かきます": [{k:"書きます"}],
+    "べんきょう": [{k:"勉強"}], "しゅくだい": [{k:"宿題"}], "しつもん": [{k:"質問"}],
+    "おかね": [{k:"お金"}], "みせ": [{k:"店"}], "りょうり": [{k:"料理"}], "おんがく": [{k:"音楽"}],
+    "えき": [{k:"駅"}], "みち": [{k:"道"}], "そら": [{k:"空"}], "うみ": [{k:"海"}], "やま": [{k:"山"}],
+    "あめ": [{k:"雨"}], "ゆき": [{k:"雪"}], "はる": [{k:"春"}], "なつ": [{k:"夏"}], "あき": [{k:"秋"}],
+    "ふゆ": [{k:"冬"}], "あさ": [{k:"朝"}], "ひる": [{k:"昼"}], "よる": [{k:"夜"}],
+    "からだ": [{k:"体"}], "あたま": [{k:"頭"}], "こころ": [{k:"心"}], "ちから": [{k:"力"}],
+    "せかい": [{k:"世界"}], "しゃしん": [{k:"写真"}], "えいが": [{k:"映画"}], "ほんとう": [{k:"本当"}],
+    "げんき": [{k:"元気"}], "だいじょうぶ": [{k:"大丈夫"}], "たいせつ": [{k:"大切"}],
+    "しんぶん": [{k:"新聞"}], "ざっし": [{k:"雑誌"}],
+    "りょこう": [{k:"旅行"}], "しゅみ": [{k:"趣味"}], "しごとば": [{k:"仕事場"}],
+
+    "きりました": [{k:"切りました",g:"刃物で切った"}],
+    "みました": [{k:"見ました"}],
+    "とりました": [{k:"撮りました",g:"写真を撮った"},{k:"取りました",g:"手に取った"}],
+    "あいました": [{k:"会いました",g:"人と会った"},{k:"合いました",g:"サイズが合った"}],
+    "かえりました": [{k:"帰りました"}],
+    "あけました": [{k:"開けました",g:"開いた"},{k:"明けました",g:"夜が明けた"}]
+  };
+  const MAX_WORD_LEN = Math.max(...Object.keys(DICT).map(k => k.length));
+
+  function segment(hiragana) {
+    const raw = [];
+    let i = 0;
+    while (i < hiragana.length) {
+      let matched = null;
+      for (let len = Math.min(MAX_WORD_LEN, hiragana.length - i); len >= 1; len--) {
+        const chunk = hiragana.slice(i, i + len);
+        if (DICT[chunk]) { matched = chunk; break; }
+      }
+      if (matched) { raw.push({ reading: matched, candidates: DICT[matched] }); i += matched.length; }
+      else { raw.push({ reading: hiragana[i], candidates: null }); i += 1; }
+    }
+    const merged = [];
+    for (const t of raw) {
+      const last = merged[merged.length - 1];
+      if (t.candidates === null && last && last.candidates === null) last.reading += t.reading;
+      else merged.push({ ...t });
+    }
+    return merged;
+  }
+
+  // ---------- UI ----------
+  const input = document.getElementById("romajiInput");
+  const preview = document.getElementById("preview");
+  const convertBtn = document.getElementById("convertBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const statusLine = document.getElementById("statusLine");
+  const errorBox = document.getElementById("imeErrorBox");
+  const transcript = document.getElementById("transcript");
+  const emptyHint = document.getElementById("emptyHint");
+  const examples = document.getElementById("examples");
+
+  function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  input.addEventListener("input", () => {
+    const h = romajiToHiragana(input.value);
+    preview.textContent = h || "\u00a0";
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); convert(); }
+  });
+
+  examples.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-ex]");
+    if (!btn) return;
+    input.value = btn.dataset.ex;
+    input.dispatchEvent(new Event("input"));
+    input.focus();
+  });
+
+  function showError(msg) {
+    errorBox.innerHTML = '<div class="error-box"><strong>変換に失敗しました:</strong> ' + esc(msg) + '</div>';
+  }
+  function clearError() { errorBox.innerHTML = ""; }
+
+  function buildDisambiguationRequest(hiragana, ambiguous) {
+    const questions = {};
+    ambiguous.forEach((t, idx) => {
+      const criteria = {};
+      t.candidates.forEach(c => { criteria[c.k] = c.g || c.k; });
+      questions["w" + idx] = {
+        type: "choice",
+        instructions: `文「${hiragana}」の中の「${t.reading}」という語について、文脈上最も適切な漢字表記を選んでください。`,
+        criteria
+      };
+    });
+    return { state: hiragana, questions };
+  }
+
+  async function convert() {
+    const romaji = input.value.trim();
+    if (!romaji) return;
+    clearError();
+    convertBtn.disabled = true;
+    statusLine.textContent = "変換中...";
+
+    try {
+      const hiragana = romajiToHiragana(romaji);
+      const tokens = segment(hiragana);
+      const ambiguous = tokens.filter(t => t.candidates && t.candidates.length > 1);
+
+      let resolvedByJev = {};
+      if (ambiguous.length > 0) {
+        const res = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildDisambiguationRequest(hiragana, ambiguous))
+        });
+        const text = await res.text();
+        let json;
+        try { json = JSON.parse(text); } catch (e) { json = null; }
+        if (!res.ok || json === null) throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
+        const answers = json.answers || {};
+        ambiguous.forEach((t, idx) => {
+          const ans = answers["w" + idx];
+          const validKanji = t.candidates.map(c => c.k);
+          resolvedByJev[idx] = (ans && validKanji.includes(ans.choice)) ? ans.choice : t.candidates[0].k;
+        });
+      }
+
+      let ambIdx = 0;
+      const partsHtml = tokens.map(t => {
+        if (t.candidates === null) return esc(t.reading);
+        if (t.candidates.length === 1) return esc(t.candidates[0].k);
+        const chosen = resolvedByJev[ambIdx];
+        const alt = t.candidates.map(c => c.k).filter(k => k !== chosen).join("/");
+        const html = `<span class="ai-word" title="読み: ${esc(t.reading)} / 他の候補: ${esc(alt)}">${esc(chosen)}</span>`;
+        ambIdx++;
+        return html;
+      });
+
+      appendBubble(romaji, partsHtml.join(""));
+      input.value = "";
+      preview.textContent = "\u00a0";
+      statusLine.textContent = ambiguous.length > 0
+        ? `Jevが${ambiguous.length}件の同音異義語を判断しました`
+        : "辞書だけで変換できました(Jevは呼んでいません)";
+    } catch (err) {
+      showError(err && err.message ? err.message : String(err));
+      statusLine.textContent = "";
+    } finally {
+      convertBtn.disabled = false;
+    }
+  }
+
+  function appendBubble(romaji, html) {
+    if (emptyHint) emptyHint.remove();
+    const div = document.createElement("div");
+    div.className = "bubble";
+    div.innerHTML = `<span class="romaji-src">${esc(romaji)}</span>${html}`;
+    transcript.appendChild(div);
+    requestAnimationFrame(() => div.classList.add("in"));
+  }
+
+  convertBtn.addEventListener("click", convert);
+  clearBtn.addEventListener("click", () => {
+    transcript.innerHTML = '<div class="empty-hint" id="emptyHint">変換すると、ここに確定した文章が積み重なっていきます。<br>紫色の「AI」マーク付きの単語は、Jevが前後の文脈から漢字を選んだ部分です。</div>';
+    statusLine.textContent = "";
+    clearError();
+  });
 })();
 
 </script>
