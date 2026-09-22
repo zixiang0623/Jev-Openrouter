@@ -731,6 +731,28 @@ body.mode-tetris {
 @keyframes blink {0%,100% { opacity: 1; } 50% { opacity: 0.25; }}
 #view-tetris .last-move { font-size: 0.76rem; color: var(--text-dim); line-height: 1.6; }
 #view-tetris .last-move b { color: var(--text); }
+
+#view-tetris .raw-details { margin-top: 8px; }
+#view-tetris .raw-details:first-of-type { margin-top: 0; }
+#view-tetris .raw-details summary {
+    cursor: pointer;
+    font-size: 0.74rem;
+    color: var(--cyan);
+    letter-spacing: 0.03em;
+  }
+#view-tetris .code-log {
+    margin: 6px 0 0;
+    max-height: 220px;
+    overflow: auto;
+    background: oklch(9% 0.01 285);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: 11px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--text-dim);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
 #view-tetris .error-box {
     border: 1px solid var(--red);
     color: var(--red);
@@ -1335,6 +1357,18 @@ body.mode-runner {
       <div class="panel">
         <h2>Jevの直前の判断</h2>
         <div class="last-move" id="lastMove">まだありません</div>
+      </div>
+
+      <div class="panel">
+        <h2>通信ログ(直近のリクエスト/レスポンス)</h2>
+        <details class="raw-details">
+          <summary>送信データ(request)</summary>
+          <pre class="code-log" id="tetrisReqLog">まだありません</pre>
+        </details>
+        <details class="raw-details">
+          <summary>受信データ(response)</summary>
+          <pre class="code-log" id="tetrisResLog">まだありません</pre>
+        </details>
       </div>
 
       <div id="tetrisErrorBox"></div>
@@ -2319,6 +2353,8 @@ body.mode-runner {
   const thinkingDot = document.getElementById("thinkingDot");
   const thinkingText = document.getElementById("thinkingText");
   const lastMove = document.getElementById("lastMove");
+  const tetrisReqLog = document.getElementById("tetrisReqLog");
+  const tetrisResLog = document.getElementById("tetrisResLog");
   const errorBox = document.getElementById("tetrisErrorBox");
   const gameoverBanner = document.getElementById("gameoverBanner");
   const startBtn = document.getElementById("startBtn");
@@ -2410,14 +2446,19 @@ body.mode-runner {
   }
 
   async function askJev(type, candidates) {
+    const requestBody = buildJevRequest(type, candidates);
+    tetrisReqLog.textContent = JSON.stringify(requestBody, null, 2);
+    tetrisResLog.textContent = "受信待ち...";
+
     const res = await fetch("/api/run", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildJevRequest(type, candidates))
+      body: JSON.stringify(requestBody)
     });
     const text = await res.text();
     let json;
     try { json = JSON.parse(text); } catch (e) { json = null; }
+    tetrisResLog.textContent = json !== null ? JSON.stringify(json, null, 2) : text.slice(0, 2000);
     if (!res.ok || json === null) {
       throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
     }
@@ -2508,6 +2549,8 @@ body.mode-runner {
     statLines.textContent = "0";
     statPieces.textContent = "0";
     lastMove.textContent = "まだありません";
+    tetrisReqLog.textContent = "まだありません";
+    tetrisResLog.textContent = "まだありません";
     gameoverBanner.hidden = true;
     startBtn.textContent = "開始";
     clearError();
