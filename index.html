@@ -1175,6 +1175,188 @@ body.mode-runner {
 #view-runner .log-chip.ok { opacity: 1; background: var(--success-soft); color: var(--success); border-color: transparent; }
 #view-runner .log-chip.fail { opacity: 1; background: var(--danger-soft); color: var(--danger); border-color: transparent; }
 
+#view-persuade {
+    --bg: oklch(94% 0.02 75);
+    --bg-2: oklch(90% 0.03 60);
+    --panel: oklch(98% 0.008 75);
+    --border: oklch(83% 0.02 60);
+    --text: oklch(24% 0.02 40);
+    --text-dim: oklch(46% 0.02 40);
+    --text-faint: oklch(60% 0.015 40);
+    --accent: oklch(42% 0.13 30);
+    --accent-soft: oklch(90% 0.05 40);
+    --meter-low: oklch(58% 0.19 25);
+    --meter-mid: oklch(75% 0.15 75);
+    --meter-high: oklch(62% 0.15 150);
+    --win-bg: oklch(90% 0.06 150);
+    --win-text: oklch(40% 0.13 150);
+  }
+@media (prefers-color-scheme: dark) {#view-persuade {
+      --bg: oklch(18% 0.015 40);
+      --bg-2: oklch(23% 0.02 40);
+      --panel: oklch(23% 0.015 40);
+      --border: oklch(34% 0.02 40);
+      --text: oklch(92% 0.01 60);
+      --text-dim: oklch(70% 0.015 50);
+      --text-faint: oklch(55% 0.012 50);
+      --accent: oklch(75% 0.10 50);
+      --accent-soft: oklch(32% 0.05 40);
+      --win-bg: oklch(28% 0.06 150);
+      --win-text: oklch(78% 0.13 150);
+    }}
+#view-persuade * { box-sizing: border-box; }
+body.mode-persuade { margin: 0; padding: 0; }
+body.mode-persuade {
+    min-height: 100vh;
+    background: radial-gradient(1000px 500px at 50% -10%, var(--bg-2), var(--bg));
+    color: var(--text);
+    font: 400 15px/1.6 Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif;
+    padding: clamp(16px, 4vw, 32px) clamp(14px, 4vw, 24px) 64px;
+  }
+#view-persuade .wrap { max-width: 700px; margin: 0 auto; }
+#view-persuade header { text-align: center; margin-bottom: 16px; }
+#view-persuade header h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 4.5vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+#view-persuade header p { margin: 5px 0 0; font-size: 0.82rem; color: var(--text-dim); font-family: -apple-system, sans-serif; }
+#view-persuade .stats-line {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+    font-family: -apple-system, sans-serif;
+  }
+#view-persuade .claim-list { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center; }
+#view-persuade .claim-chip {
+    font: 600 0.76rem/1.4 -apple-system, sans-serif;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+#view-persuade .claim-chip:hover { background: var(--accent-soft); }
+#view-persuade .claim-chip[aria-pressed="true"] { background: var(--accent); color: var(--panel); border-color: transparent; }
+#view-persuade .claim-chip.won::after { content: " ✓"; }
+#view-persuade .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+#view-persuade .claim-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+#view-persuade .meter-wrap { margin-bottom: 6px; }
+#view-persuade .meter-track {
+    height: 16px;
+    border-radius: 999px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+#view-persuade .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--meter-low), var(--meter-mid) 60%, var(--meter-high));
+    transition: width 700ms cubic-bezier(0.16,1,0.3,1);
+  }
+#view-persuade .meter-threshold {
+    position: absolute;
+    top: -3px; bottom: -3px;
+    width: 2px;
+    background: var(--text);
+    opacity: 0.5;
+    left: 70%;
+  }
+#view-persuade .meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    margin-top: 4px;
+    font-family: -apple-system, sans-serif;
+  }
+#view-persuade .meter-pct { font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 4px; font-family: -apple-system, sans-serif; }
+#view-persuade .meter-delta { font-size: 0.8rem; text-align: center; margin-bottom: 10px; font-family: -apple-system, sans-serif; min-height: 1.2em; }
+#view-persuade .meter-delta.up { color: var(--meter-high); }
+#view-persuade .meter-delta.down { color: var(--meter-low); }
+#view-persuade textarea {
+    width: 100%;
+    font: 400 0.95rem/1.6 -apple-system, "Hiragino Sans", sans-serif;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+  }
+#view-persuade textarea:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+#view-persuade .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+#view-persuade button {
+    font: 700 0.85rem/1.4 -apple-system, sans-serif;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    transition: transform 90ms ease-out, background 150ms ease;
+  }
+#view-persuade button:hover { background: var(--accent-soft); }
+#view-persuade button:active { transform: scale(0.96); }
+#view-persuade button:disabled { opacity: 0.45; cursor: not-allowed; }
+#view-persuade button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#view-persuade button.primary { background: var(--accent); color: var(--panel); border-color: transparent; }
+#view-persuade button.primary:hover { filter: brightness(1.1); }
+#view-persuade .win-banner {
+    text-align: center;
+    background: var(--win-bg);
+    color: var(--win-text);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 700;
+    font-family: -apple-system, sans-serif;
+    margin-bottom: 14px;
+  }
+#view-persuade .error-box {
+    border: 1px solid var(--meter-low);
+    color: var(--meter-low);
+    background: var(--accent-soft);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: -apple-system, sans-serif;
+    margin-bottom: 14px;
+  }
+#view-persuade .history { display: flex; flex-direction: column; gap: 6px; }
+#view-persuade .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    font-family: -apple-system, sans-serif;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+#view-persuade .history-item .arg-text { color: var(--text-dim); flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px; }
+#view-persuade .history-item .pct { font-weight: 800; flex: 0 0 auto; }
+
 </style>
 </head>
 <body class="mode-console">
@@ -1186,6 +1368,7 @@ body.mode-runner {
   <button id="tab-mail" type="button" aria-pressed="false">MAIL SORT</button>
   <button id="tab-ime" type="button" aria-pressed="false">ROMAJI IME</button>
   <button id="tab-runner" type="button" aria-pressed="false">PIXEL RUNNER</button>
+  <button id="tab-persuade" type="button" aria-pressed="false">PERSUADE JEV</button>
 </div>
 
 <div class="view" id="view-console">
@@ -1458,6 +1641,46 @@ body.mode-runner {
   <div id="statusBanner" class="status-banner" hidden></div>
   <div id="runnerErrorBox"></div>
   <div class="log" id="log"></div>
+
+</div>
+</div>
+
+<div class="view" id="view-persuade" hidden>
+<div class="wrap">
+
+  <header>
+    <h1>Jevを説得せよ</h1>
+    <p>主張に論拠を添えて、Jevの納得度(confidence)を70%まで動かせるか挑戦する</p>
+  </header>
+
+  <div class="stats-line" id="statsLine">まだ挑戦していません</div>
+
+  <div class="claim-list" id="claimList"></div>
+
+  <div class="card">
+    <div class="claim-text" id="claimText">左上のお題を選んでください</div>
+
+    <div id="winBanner"></div>
+
+    <div class="meter-pct" id="meterPct">--%</div>
+    <div class="meter-wrap">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div><div class="meter-threshold"></div></div>
+      <div class="meter-label"><span>0%</span><span>説得ライン 70%</span><span>100%</span></div>
+    </div>
+    <div class="meter-delta" id="meterDelta">&nbsp;</div>
+
+    <textarea id="argumentInput" placeholder="ここに説得の論拠を書いてください" spellcheck="false"></textarea>
+    <div class="actions">
+      <button id="baselineBtn">最初の反応を見る</button>
+      <button class="primary" id="persuadeBtn">説得する</button>
+    </div>
+  </div>
+
+  <div id="persuadeErrorBox"></div>
+
+  <div class="card">
+    <div class="history" id="history"></div>
+  </div>
 
 </div>
 </div>
@@ -2094,7 +2317,8 @@ body.mode-runner {
     tetris: document.getElementById("view-tetris"),
     mail: document.getElementById("view-mail"),
     ime: document.getElementById("view-ime"),
-    runner: document.getElementById("view-runner")
+    runner: document.getElementById("view-runner"),
+    persuade: document.getElementById("view-persuade")
   };
   const tabs = {
     console: document.getElementById("tab-console"),
@@ -2102,7 +2326,8 @@ body.mode-runner {
     tetris: document.getElementById("tab-tetris"),
     mail: document.getElementById("tab-mail"),
     ime: document.getElementById("tab-ime"),
-    runner: document.getElementById("tab-runner")
+    runner: document.getElementById("tab-runner"),
+    persuade: document.getElementById("tab-persuade")
   };
   const MODES = Object.keys(views);
   const LS_KEY = "jev_active_mode";
@@ -3488,6 +3713,214 @@ body.mode-runner {
 
   renderLog(-1, {});
   drawIdle();
+})();
+
+</script>
+<script>
+
+(() => {
+  "use strict";
+
+  const WIN_THRESHOLD = 0.7;
+
+  const CLAIMS = [
+    { id: "pineapple", text: "パイナップルはピザのトッピングとして優れている" },
+    { id: "cat", text: "猫は犬より優れたペットである" },
+    { id: "breakfast", text: "朝ごはんは1日の食事の中で一番大切だ" },
+    { id: "wfh", text: "在宅勤務はオフィス勤務より生産的だ" },
+    { id: "book", text: "紙の本は電子書籍より優れている" },
+    { id: "summer", text: "夏は冬より良い季節だ" },
+    { id: "coffee", text: "コーヒーは紅茶より優れた飲み物だ" },
+    { id: "earlybird", text: "早起きは夜型より優れた生き方だ" }
+  ];
+
+  function buildPersuasionRequest(claimText, argument) {
+    const state = argument ? { claim: claimText, argument } : { claim: claimText };
+    return {
+      state,
+      questions: {
+        verdict: {
+          type: "noul",
+          instructions: argument
+            ? "state.argument で示された根拠を踏まえて、state.claim の主張に真剣に納得できるかどうか判定してください。的外れな主張や根拠のない主張には納得しないでください。"
+            : "特に根拠が示されていない状態で、state.claim の主張に一般常識に照らして納得できるかどうか判定してください。",
+          criteria: { true: "主張に納得できる", false: "納得できない" }
+        }
+      }
+    };
+  }
+  function isWin(confidence) { return typeof confidence === "number" && confidence >= WIN_THRESHOLD; }
+
+  // claimId -> { baseline: number|null, attempts: [{argument, confidence}], won: bool }
+  const state = {};
+  for (const c of CLAIMS) state[c.id] = { baseline: null, attempts: [], won: false };
+  let activeId = null;
+
+  const claimListEl = document.getElementById("claimList");
+  const claimTextEl = document.getElementById("claimText");
+  const meterPct = document.getElementById("meterPct");
+  const meterFill = document.getElementById("meterFill");
+  const meterDelta = document.getElementById("meterDelta");
+  const winBanner = document.getElementById("winBanner");
+  const argumentInput = document.getElementById("argumentInput");
+  const baselineBtn = document.getElementById("baselineBtn");
+  const persuadeBtn = document.getElementById("persuadeBtn");
+  const errorBox = document.getElementById("persuadeErrorBox");
+  const historyEl = document.getElementById("history");
+  const statsLine = document.getElementById("statsLine");
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+  function pct(n) { return Math.round(Math.max(0, Math.min(1, n)) * 100); }
+
+  function renderClaimList() {
+    claimListEl.innerHTML = CLAIMS.map(c => {
+      const s = state[c.id];
+      const cls = "claim-chip" + (c.id === activeId ? "" : "") + (s.won ? " won" : "");
+      return `<button type="button" class="${cls}" data-id="${c.id}" aria-pressed="${c.id === activeId}">${esc(c.text.slice(0, 10))}${c.text.length > 10 ? "…" : ""}</button>`;
+    }).join("");
+  }
+
+  function renderStats() {
+    const wonCount = CLAIMS.filter(c => state[c.id].won).length;
+    const triedCount = CLAIMS.filter(c => state[c.id].attempts.length > 0 || state[c.id].baseline !== null).length;
+    statsLine.textContent = `説得成功 ${wonCount} / ${CLAIMS.length}件(挑戦済み ${triedCount}件)`;
+  }
+
+  function renderMeter(confidence, prevConfidence) {
+    if (confidence === null) {
+      meterPct.textContent = "--%";
+      meterFill.style.width = "0%";
+      meterDelta.textContent = "\u00a0";
+      meterDelta.className = "meter-delta";
+      return;
+    }
+    const p = pct(confidence);
+    meterPct.textContent = p + "%";
+    meterFill.style.width = p + "%";
+    if (prevConfidence !== null && prevConfidence !== undefined) {
+      const diff = p - pct(prevConfidence);
+      if (diff > 0) { meterDelta.textContent = `前回より +${diff}pt 上昇`; meterDelta.className = "meter-delta up"; }
+      else if (diff < 0) { meterDelta.textContent = `前回より ${diff}pt 下降`; meterDelta.className = "meter-delta down"; }
+      else { meterDelta.textContent = "前回から変化なし"; meterDelta.className = "meter-delta"; }
+    } else {
+      meterDelta.textContent = "\u00a0";
+      meterDelta.className = "meter-delta";
+    }
+  }
+
+  function renderHistory() {
+    const s = state[activeId];
+    if (!s || s.attempts.length === 0) {
+      historyEl.innerHTML = '<div style="font-size:0.8rem;color:var(--text-faint);font-family:-apple-system,sans-serif;">まだ説得を試みていません。</div>';
+      return;
+    }
+    historyEl.innerHTML = s.attempts.map((a, i) => `
+      <div class="history-item">
+        <span class="arg-text">試行${i+1}: ${esc(a.argument)}</span>
+        <span class="pct">${pct(a.confidence)}%</span>
+      </div>
+    `).reverse().join("");
+  }
+
+  function renderWinBanner() {
+    const s = state[activeId];
+    winBanner.innerHTML = (s && s.won) ? '<div class="win-banner">Jevを説得できました！</div>' : "";
+  }
+
+  function clearError() { errorBox.innerHTML = ""; }
+  function showError(msg) { errorBox.innerHTML = '<div class="error-box"><strong>失敗:</strong> ' + esc(msg) + '</div>'; }
+
+  function selectClaim(id) {
+    activeId = id;
+    const c = CLAIMS.find(x => x.id === id);
+    claimTextEl.textContent = c.text;
+    argumentInput.value = "";
+    clearError();
+    renderClaimList();
+    renderWinBanner();
+    const s = state[id];
+    const last = s.attempts.length ? s.attempts[s.attempts.length - 1].confidence : s.baseline;
+    renderMeter(last !== null && last !== undefined ? last : null, null);
+    renderHistory();
+  }
+
+  async function callJev(argument) {
+    const c = CLAIMS.find(x => x.id === activeId);
+    const res = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildPersuasionRequest(c.text, argument))
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch (e) { json = null; }
+    if (!res.ok || json === null) throw new Error(json ? JSON.stringify(json) : text.slice(0, 400));
+    const ans = json.answers && json.answers.verdict;
+    if (!ans || typeof ans.noul !== "number") throw new Error("Jevの応答からnoulが取得できませんでした: " + JSON.stringify(json));
+    return ans.noul;
+  }
+
+  async function getBaseline() {
+    if (!activeId) return;
+    clearError();
+    baselineBtn.disabled = true;
+    persuadeBtn.disabled = true;
+    try {
+      const conf = await callJev(null);
+      const s = state[activeId];
+      const prev = s.baseline;
+      s.baseline = conf;
+      renderMeter(conf, prev);
+      renderStats();
+    } catch (err) {
+      showError(err && err.message ? err.message : String(err));
+    } finally {
+      baselineBtn.disabled = false;
+      persuadeBtn.disabled = false;
+    }
+  }
+
+  async function persuade() {
+    if (!activeId) return;
+    const argument = argumentInput.value.trim();
+    if (!argument) { argumentInput.focus(); return; }
+    clearError();
+    baselineBtn.disabled = true;
+    persuadeBtn.disabled = true;
+    persuadeBtn.textContent = "説得中...";
+    try {
+      const conf = await callJev(argument);
+      const s = state[activeId];
+      const prev = s.attempts.length ? s.attempts[s.attempts.length - 1].confidence : s.baseline;
+      s.attempts.push({ argument, confidence: conf });
+      if (isWin(conf)) s.won = true;
+      renderMeter(conf, prev);
+      renderHistory();
+      renderWinBanner();
+      renderClaimList();
+      renderStats();
+    } catch (err) {
+      showError(err && err.message ? err.message : String(err));
+    } finally {
+      baselineBtn.disabled = false;
+      persuadeBtn.disabled = false;
+      persuadeBtn.textContent = "説得する";
+    }
+  }
+
+  claimListEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-id]");
+    if (!btn) return;
+    selectClaim(btn.dataset.id);
+  });
+  baselineBtn.addEventListener("click", getBaseline);
+  persuadeBtn.addEventListener("click", persuade);
+  argumentInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); persuade(); }
+  });
+
+  renderClaimList();
+  renderStats();
 })();
 
 </script>
