@@ -2078,8 +2078,18 @@ body.mode-persuade {
       </div>`;
   }
 
+  // Workerからの応答は複数の形で返ってくることがあるため、
+  // 実際に answers を持つ階層まで自動でたどる。
+  function unwrapResult(json) {
+    if (json && typeof json === "object") {
+      if (json.answers) return json;
+      if (json.result && typeof json.result === "object") return unwrapResult(json.result);
+    }
+    return json;
+  }
+
   function renderSuccess(json) {
-    const result = (json && typeof json === "object" && "result" in json && "success" in json) ? json.result : json;
+    const result = unwrapResult(json);
     const answers = (result && result.answers) || {};
     const usage = (result && result.usage) || null;
     const names = Object.keys(answers);
