@@ -2201,6 +2201,7 @@ body.mode-runner {
   function generateCandidates(board, type) {
     const rotations = getRotations(type);
     const candidates = [];
+    const panic = isPanicking(board);
     rotations.forEach((matrix, rotIndex) => {
       const cells = cellsOf(matrix);
       const xs = cells.map(c => c.x);
@@ -2211,20 +2212,53 @@ body.mode-runner {
         placeCells(test, cells, x, landY, type);
         const { board: cleared, cleared: linesCleared } = clearLines(test);
         const metrics = computeMetrics(cleared);
-        const heuristicScore = scoreMetrics(metrics, linesCleared);
-        candidates.push({ rotIndex, x, landY, cells, linesCleared, ...metrics, heuristicScore, resultBoard: cleared });
+        const touchesWell = cells.some(c => (x + c.x) === WELL_COLUMN);
+        const heuristicScore = panic
+          ? survivalScore(metrics, linesCleared)
+          : highScoreScore(metrics, linesCleared, touchesWell);
+        candidates.push({ rotIndex, x, landY, cells, linesCleared, ...metrics, heuristicScore, resultBoard: cleared, panicMode: panic });
       }
     });
     return candidates;
   }
 
-  // 標準的な重み付け(Dellacherie/El-Tetris系)。高いほど良い盤面。
-  function scoreMetrics(metrics, linesCleared) {
+  // 盤面が危険なほど積み上がっていたら、井戸戦略より生存を優先する
+  const WELL_COLUMN = COLS - 1; // 右端の列をテトリス用に空けておく「井戸」にする
+  const PANIC_MAX_HEIGHT = 14;  // どこかの列がこの高さを超えたら生存優先モードへ
+  const LINE_CLEAR_BONUS = [0, 1, 3, 5, 8]; // 本家スコア比(100/300/500/800)を反映
+
+  function isPanicking(board) {
+    for (let x = 0; x < COLS; x++) {
+      for (let y = 0; y < ROWS; y++) {
+        if (board[y][x]) { if (ROWS - y >= PANIC_MAX_HEIGHT) return true; break; }
+      }
+    }
+    return false;
+  }
+
+  // 生存優先(旧来のDellacherie系。ラインは消せるだけ消しておく)
+  function survivalScore(metrics, linesCleared) {
     return (
       -0.510066 * metrics.aggregateHeight +
       0.760666 * linesCleared +
       -0.35663 * metrics.holes +
       -0.184483 * metrics.bumpiness
+    );
+  }
+
+  // 高得点狙い: 右端の列を空けたまま積み上げ、テトリス(4ライン消し)を狙う
+  function highScoreScore(metrics, linesCleared, touchesWell) {
+    // 井戸の両隣の高さ差はbumpinessの計算対象から除外したいが、
+    // computeMetricsは全体のbumpinessしか返さないため、ここでは
+    // 「井戸に触れた場合の追加ペナルティ」で代用して過度な井戸埋めを防ぐ。
+    const wellViolation = (touchesWell && linesCleared < 4) ? -3 : 0;
+    const lineBonus = LINE_CLEAR_BONUS[linesCleared] || 0;
+    return (
+      -0.510066 * metrics.aggregateHeight +
+      lineBonus +
+      -0.35663 * metrics.holes +
+      -0.184483 * metrics.bumpiness +
+      wellViolation
     );
   }
 
